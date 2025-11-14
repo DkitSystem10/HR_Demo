@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Eye, EyeOff } from 'lucide-react'
-import logo from '../assets/logo.png'
+import Topbar from '../components/Topbar'
+import Navbar from '../components/Navbar'
 
 const SignUp = () => {
   const navigate = useNavigate()
@@ -37,22 +38,11 @@ const SignUp = () => {
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      {/* Header with Logo */}
-      <div className="px-6 md:px-12 py-6">
-        <div className="flex items-center gap-2">
-          <img 
-            src={logo} 
-            alt="DurkkasHR Logo" 
-            className="h-14 w-auto md:h-20"
-          />
-          <span className="text-2xl font-bold text-charcoal">
-            Durkkas<span className="text-deep-teal">HR</span>
-          </span>
-        </div>
-      </div>
-
+      <Topbar />
+      <Navbar />
+      
       {/* Main Content - Two Column Layout */}
-      <div className="flex-1 flex">
+      <div className="flex-1 flex pt-24 md:pt-28">
         {/* Left Side - Theme Colored Design */}
         <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
           {/* Gradient Background */}

@@ -36,7 +36,8 @@ const Navbar = () => {
     if (path.startsWith('/blog')) return 'Blog'
     if (path.startsWith('/pricing')) return 'Pricing'
     if (path.startsWith('/contact')) return 'Contact Us'
-    return 'Home'
+    if (path.startsWith('/signup')) return ''
+    return ''
   }, [location.pathname, location.hash])
 
   const menuItems = ['Home', 'Features', 'Pricing', 'Blog', 'About Us', 'Contact Us']
