@@ -12,6 +12,19 @@ const Blog = () => {
 
   const categories = ['all', 'payroll', 'compliance', 'hr-tech', 'case-studies', 'guides']
 
+  // Format category name: capitalize each word (e.g., 'hr-tech' -> 'HR Tech')
+  const formatCategoryName = (cat) => {
+    if (cat === 'all') return 'All'
+    return cat
+      .split('-')
+      .map(word => {
+        // Special case: 'hr' should be 'HR' (all caps)
+        if (word.toLowerCase() === 'hr') return 'HR'
+        return word.charAt(0).toUpperCase() + word.slice(1)
+      })
+      .join(' ')
+  }
+
   const blogPosts = [
     {
       title: 'Complete Guide to PF/ESIC Compliance in 2024',
@@ -119,30 +132,19 @@ const Blog = () => {
               />
             </div>
             <div className="flex flex-wrap gap-2">
-              {categories.map((category) => {
-                // Format category name: capitalize each word (e.g., 'hr-tech' -> 'HR Tech')
-                const formatCategoryName = (cat) => {
-                  if (cat === 'all') return 'All'
-                  return cat
-                    .split('-')
-                    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                    .join(' ')
-                }
-                
-                return (
-                  <button
-                    key={category}
-                    onClick={() => setSelectedCategory(category)}
-                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                      selectedCategory === category
-                        ? 'bg-primary-600 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    {formatCategoryName(category)}
-                  </button>
-                )
-              })}
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  onClick={() => setSelectedCategory(category)}
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                    selectedCategory === category
+                      ? 'bg-primary-600 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {formatCategoryName(category)}
+                </button>
+              ))}
             </div>
           </div>
         </div>
@@ -169,10 +171,7 @@ const Blog = () => {
                     />
                     <div className="absolute top-4 left-4">
                       <span className="bg-primary-600 text-white px-3 py-1 rounded-full text-sm font-medium">
-                        {post.category
-                          .split('-')
-                          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                          .join(' ')}
+                        {formatCategoryName(post.category)}
                       </span>
                     </div>
                   </div>
