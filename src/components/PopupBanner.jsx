@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { X } from 'lucide-react'
 
 const PopupBanner = () => {
@@ -10,6 +10,9 @@ const PopupBanner = () => {
     }
     return true
   })
+  const [popupTop, setPopupTop] = useState('8rem') // Default fallback
+  const backdropRef = useRef(null)
+  const modalRef = useRef(null)
   const [formData, setFormData] = useState({
     name: '',
     businessName: '',
@@ -17,6 +20,67 @@ const PopupBanner = () => {
     phone: '',
     country: ''
   })
+
+  // Calculate actual navbar height dynamically
+  useEffect(() => {
+    const calculatePopupPosition = () => {
+      if (typeof window === 'undefined') return
+
+      // Find the navbar element - try multiple selectors
+      const navbar = document.querySelector('nav[class*="fixed"]') || 
+                     document.querySelector('nav.fixed') ||
+                     document.querySelector('nav')
+      
+      // Find topbar - try multiple selectors
+      const topbar = document.querySelector('div[class*="topbar"]') ||
+                     document.querySelector('div[class*="h-10"][class*="fixed"]') ||
+                     document.querySelector('div[class*="z-[60]"][class*="fixed"]')
+      
+      if (navbar) {
+        const navbarRect = navbar.getBoundingClientRect()
+        const topbarRect = topbar ? topbar.getBoundingClientRect() : null
+        const topbarHeight = topbarRect ? topbarRect.height : 40 // fallback to 40px
+        const navbarBottom = navbarRect.bottom
+        const totalHeight = navbarBottom
+        // Add extra safety margin (48px = 3rem) to prevent any overlap at any zoom level
+        const safeTop = totalHeight + 48 // 48px = 3rem safety margin
+        
+        setPopupTop(`${safeTop}px`)
+      } else {
+        // Fallback calculation
+        const isMobile = window.innerWidth < 768
+        const topbarHeight = 40 // 2.5rem
+        const navbarHeight = isMobile ? 64 : 80 // h-16 or h-20
+        const safeTop = topbarHeight + navbarHeight + 48 // 48px safety margin
+        setPopupTop(`${safeTop}px`)
+      }
+    }
+
+    // Calculate on mount and when window resizes or zooms
+    calculatePopupPosition()
+    
+    // Use requestAnimationFrame for smooth updates
+    let rafId = requestAnimationFrame(calculatePopupPosition)
+    
+    window.addEventListener('resize', calculatePopupPosition)
+    window.addEventListener('orientationchange', calculatePopupPosition)
+    
+    // Recalculate on scroll (in case navbar changes)
+    window.addEventListener('scroll', calculatePopupPosition, { passive: true })
+    
+    // Also recalculate after delays to catch any dynamic content
+    const timeoutId1 = setTimeout(calculatePopupPosition, 100)
+    const timeoutId2 = setTimeout(calculatePopupPosition, 500)
+
+    return () => {
+      cancelAnimationFrame(rafId)
+      window.removeEventListener('resize', calculatePopupPosition)
+      window.removeEventListener('orientationchange', calculatePopupPosition)
+      window.removeEventListener('scroll', calculatePopupPosition)
+      clearTimeout(timeoutId1)
+      clearTimeout(timeoutId2)
+    }
+  }, [isOpen])
 
   const handleClose = () => {
     setIsOpen(false)
@@ -49,14 +113,20 @@ const PopupBanner = () => {
 
   return (
     <>
-      {/* Backdrop - starts below navbar (topbar: 2.5rem + navbar: 4rem mobile / 5rem desktop) */}
+      {/* Backdrop - starts below navbar (dynamically calculated) */}
       <div 
-        className="fixed left-0 right-0 bottom-0 bg-black/60 backdrop-blur-sm z-[50] transition-opacity duration-300 md:top-[7.5rem] top-[6.5rem]"
+        ref={backdropRef}
+        className="fixed left-0 right-0 bottom-0 bg-black/60 backdrop-blur-sm z-[50] transition-opacity duration-300"
+        style={{ top: popupTop }}
         onClick={handleClose}
       ></div>
 
       {/* Popup Modal - appears above backdrop but below navbar */}
-      <div className="fixed left-0 right-0 bottom-0 z-[55] flex items-center justify-center p-4 pointer-events-none md:top-[7.5rem] top-[6.5rem]">
+      <div 
+        ref={modalRef}
+        className="fixed left-0 right-0 bottom-0 z-[55] flex items-center justify-center p-4 pointer-events-none"
+        style={{ top: popupTop }}
+      >
         <div className="relative bg-navy-blue border-2 border-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden pointer-events-auto">
           {/* Decorative Triangles - More prominent and colorful */}
           <div className="absolute top-0 left-0 w-24 h-24">

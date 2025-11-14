@@ -123,4 +123,7 @@ input, textarea, select {
   }
 }
 
+/* Popup positioning is now handled dynamically via JavaScript in PopupBanner.jsx */
+/* This ensures accurate positioning at all zoom levels by calculating actual rendered heights */
+
 
