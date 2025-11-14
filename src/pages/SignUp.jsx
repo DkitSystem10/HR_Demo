@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Eye, EyeOff } from 'lucide-react'
 import Topbar from '../components/Topbar'
 import Navbar from '../components/Navbar'
 
@@ -9,11 +8,11 @@ const SignUp = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    password: '',
+    companyName: '',
+    description: '',
     phoneCode: '+91',
     phoneNumber: ''
   })
-  const [showPassword, setShowPassword] = useState(false)
   const [agreeToTerms, setAgreeToTerms] = useState(false)
 
   const handleChange = (e) => {
@@ -153,35 +152,38 @@ const SignUp = () => {
               />
             </div>
 
-            {/* Password Field */}
+            {/* Company Name Field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-charcoal mb-2">
-                Password <span className="text-red-500">*</span>
+              <label htmlFor="companyName" className="block text-sm font-medium text-charcoal mb-2">
+                Company Name <span className="text-red-500">*</span>
               </label>
-              <div className="relative">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  id="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-orange focus:border-transparent pr-12"
-                  placeholder="Enter your password"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-charcoal transition-colors"
-                  aria-label="Toggle password visibility"
-                >
-                  {showPassword ? (
-                    <EyeOff className="w-5 h-5" />
-                  ) : (
-                    <Eye className="w-5 h-5" />
-                  )}
-                </button>
-              </div>
+              <input
+                type="text"
+                id="companyName"
+                name="companyName"
+                value={formData.companyName}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-orange focus:border-transparent"
+                placeholder="Enter your company name"
+              />
+            </div>
+
+            {/* Description Field */}
+            <div>
+              <label htmlFor="description" className="block text-sm font-medium text-charcoal mb-2">
+                Description <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                id="description"
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                required
+                rows={4}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-orange focus:border-transparent resize-none"
+                placeholder="Tell us about your requirements..."
+              />
             </div>
 
             {/* Phone Number Field */}

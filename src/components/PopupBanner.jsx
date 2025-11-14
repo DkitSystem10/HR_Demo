@@ -116,15 +116,15 @@ const PopupBanner = () => {
       {/* Backdrop - starts below navbar (dynamically calculated) */}
       <div 
         ref={backdropRef}
-        className="fixed left-0 right-0 bottom-0 bg-black/60 backdrop-blur-sm z-[50] transition-opacity duration-300"
+        className="fixed left-0 right-0 bottom-0 bg-black/60 backdrop-blur-sm z-[70] transition-opacity duration-300"
         style={{ top: popupTop }}
         onClick={handleClose}
       ></div>
 
-      {/* Popup Modal - appears above backdrop but below navbar */}
+      {/* Popup Modal - appears above backdrop and navbar */}
       <div 
         ref={modalRef}
-        className="fixed left-0 right-0 bottom-0 z-[55] flex items-center justify-center p-4 pointer-events-none"
+        className="fixed left-0 right-0 bottom-0 z-[75] flex items-center justify-center p-4 pointer-events-none"
         style={{ top: popupTop }}
       >
         <div className="relative bg-navy-blue border-2 border-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden pointer-events-auto">

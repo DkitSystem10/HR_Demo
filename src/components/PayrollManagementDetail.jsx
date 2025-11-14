@@ -187,17 +187,17 @@ const PayrollManagementDetail = () => {
               <div className="bg-white rounded-3xl shadow-lg border border-slate-100/70 p-6 md:p-8">
                 <h3 className="text-xl font-semibold text-charcoal mb-3">What You Achieve</h3>
                 <ul className="space-y-3 text-gray-700 leading-relaxed">
-                  <li className="flex gap-3">
-                    <span className="mt-2 inline-flex w-2 h-2 rounded-full bg-accent-orange"></span>
-                    Automate payroll preparation, reviews and approvals across entities.
+                  <li className="flex items-start gap-3">
+                    <span className="mt-2 flex-shrink-0 inline-flex w-2 h-2 rounded-full bg-accent-orange"></span>
+                    <span className="flex-1">Automate payroll preparation, reviews and approvals across entities.</span>
                   </li>
-                  <li className="flex gap-3">
-                    <span className="mt-2 inline-flex w-2 h-2 rounded-full bg-accent-orange"></span>
-                    Maintain error-free calculations with audit trails at every step.
+                  <li className="flex items-start gap-3">
+                    <span className="mt-2 flex-shrink-0 inline-flex w-2 h-2 rounded-full bg-accent-orange"></span>
+                    <span className="flex-1">Maintain error-free calculations with audit trails at every step.</span>
                   </li>
-                  <li className="flex gap-3">
-                    <span className="mt-2 inline-flex w-2 h-2 rounded-full bg-accent-orange"></span>
-                    Empower employees with transparent access to payslips and tax information.
+                  <li className="flex items-start gap-3">
+                    <span className="mt-2 flex-shrink-0 inline-flex w-2 h-2 rounded-full bg-accent-orange"></span>
+                    <span className="flex-1">Empower employees with transparent access to payslips and tax information.</span>
                   </li>
                 </ul>
               </div>
@@ -236,10 +236,10 @@ const PayrollManagementDetail = () => {
                     </div>
                     <div
                       className={`md:w-1/2 w-full flex ${
-                        isLeft ? 'md:order-1 md:pr-12 md:text-right' : 'md:order-2 md:pl-12 md:text-left'
+                        isLeft ? 'md:order-1 md:pr-12' : 'md:order-2 md:pl-12'
                       }`}
                     >
-                      <div className="relative rounded-3xl bg-white shadow-xl border border-white/70 p-6 md:p-8 w-full flex flex-col">
+                      <div className="relative rounded-3xl bg-white shadow-xl border border-white/70 p-6 md:p-8 w-full flex flex-col text-left">
                         <div
                           className={`hidden md:flex absolute top-6 ${
                             isLeft ? '-right-12' : '-left-12'
@@ -257,13 +257,13 @@ const PayrollManagementDetail = () => {
                         <div className="md:hidden mb-5 inline-flex w-14 h-14 items-center justify-center rounded-full bg-white shadow-md border border-white/70">
                           <Icon className="w-6 h-6 text-accent-orange" />
                         </div>
-                        <h3 className="text-xl md:text-2xl font-bold text-charcoal">{highlight.title}</h3>
-                        <p className="mt-3 text-gray-700 leading-relaxed">{highlight.description}</p>
-                        <ul className="mt-5 space-y-3 text-gray-600">
+                        <h3 className="text-xl md:text-2xl font-bold text-charcoal text-left">{highlight.title}</h3>
+                        <p className="mt-3 text-gray-700 leading-relaxed text-left">{highlight.description}</p>
+                        <ul className="mt-5 space-y-3 text-gray-600 text-left">
                           {highlight.bullets.map((bullet, idx) => (
-                            <li key={idx} className="flex items-start gap-3">
-                              <span className="mt-2 inline-flex w-2 h-2 rounded-full bg-deep-teal"></span>
-                              <span className="leading-relaxed">{bullet}</span>
+                            <li key={idx} className="flex items-start gap-3 text-left">
+                              <span className="mt-2 flex-shrink-0 inline-flex w-2 h-2 rounded-full bg-deep-teal"></span>
+                              <span className="flex-1 leading-relaxed text-left">{bullet}</span>
                             </li>
                           ))}
                         </ul>
@@ -418,15 +418,15 @@ const PayrollManagementDetail = () => {
               return (
                 <div 
                   key={integration.title} 
-                  className="group relative rounded-2xl overflow-hidden bg-white shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
+                  className="group relative rounded-2xl overflow-hidden bg-white shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full"
                 >
                   {/* Gradient Background Overlay */}
                   <div className={`absolute inset-0 bg-gradient-to-br ${integration.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}></div>
                   
                   {/* Content */}
-                  <div className="relative p-6 md:p-8">
+                  <div className="relative p-6 md:p-8 flex flex-col h-full">
                     {/* Icon */}
-                    <div className={`inline-flex w-16 h-16 items-center justify-center rounded-xl mb-5 ${integration.iconBg} group-hover:scale-110 transition-transform duration-300`}>
+                    <div className={`inline-flex w-16 h-16 items-center justify-center rounded-xl mb-5 flex-shrink-0 ${integration.iconBg} group-hover:scale-110 transition-transform duration-300`}>
                       <Icon className={`w-8 h-8 ${
                         index === 0 ? 'text-deep-teal' : 
                         index === 1 ? 'text-accent-orange' : 
@@ -435,7 +435,7 @@ const PayrollManagementDetail = () => {
                     </div>
                     
                     {/* Title */}
-                    <h4 className={`text-xl md:text-2xl font-bold mb-3 ${
+                    <h4 className={`text-xl md:text-2xl font-bold mb-3 flex-shrink-0 ${
                       index === 0 ? 'text-deep-teal' : 
                       index === 1 ? 'text-accent-orange' : 
                       'bg-gradient-to-r from-deep-teal to-accent-orange bg-clip-text text-transparent'
@@ -444,7 +444,7 @@ const PayrollManagementDetail = () => {
                     </h4>
                     
                     {/* Description */}
-                    <p className="text-gray-700 leading-relaxed text-base">
+                    <p className="text-gray-700 leading-relaxed text-base flex-grow">
                       {integration.description}
                     </p>
                     
@@ -484,8 +484,8 @@ const PayrollManagementDetail = () => {
               <ul className="mt-5 space-y-4 text-gray-700 leading-relaxed">
                 {benefits.map((benefit, index) => (
                   <li key={index} className="flex items-start gap-3">
-                    <span className="mt-2 inline-flex w-2 h-2 rounded-full bg-accent-orange"></span>
-                    <span>{benefit}</span>
+                    <span className="mt-2 flex-shrink-0 inline-flex w-2 h-2 rounded-full bg-accent-orange"></span>
+                    <span className="flex-1">{benefit}</span>
                   </li>
                 ))}
               </ul>

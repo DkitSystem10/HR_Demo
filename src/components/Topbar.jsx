@@ -2,7 +2,15 @@ import React from 'react'
 
 const Topbar = () => {
   return (
-    <div className="bg-navy-blue text-white px-4 md:px-8 fixed top-0 left-0 right-0 z-[60] h-10 flex items-center">
+    <div 
+      className="bg-navy-blue text-white px-4 md:px-8 fixed top-0 left-0 right-0 z-[60] h-10 flex items-center"
+      style={{ 
+        height: '2.5rem',
+        minHeight: '2.5rem',
+        transform: 'scale(1)',
+        transformOrigin: 'top left'
+      }}
+    >
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-sm w-full">
         {/* Left Side - Contact Info */}
         <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6">

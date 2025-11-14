@@ -226,7 +226,7 @@ const Contact = () => {
             <h2 className="text-2xl md:text-3xl font-bold text-charcoal mb-6 text-center">Find Us on Map</h2>
             <div className="bg-white rounded-2xl shadow-soft overflow-hidden">
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3888.0130733784714!2d80.2709!3d13.0827!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a5265ea4f7d3361%3A0x6e61a70b82bdee6f!2sChennai%2C%20Tamil%20Nadu!5e0!3m2!1sen!2sin!4v1234567890"
+                src="https://www.google.com/maps?q=MDR+Nagar,+Aruppukottai,+Tamil+Nadu+626101&output=embed&zoom=15"
                 width="100%"
                 height="450"
                 style={{ border: 0 }}
@@ -234,8 +234,22 @@ const Contact = () => {
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
                 className="w-full"
-                title="Durkkas People Office Location"
+                title="Durkkas Innovation Office Location - MDR Nagar, Aruppukottai"
               />
+            </div>
+            <div className="mt-4 text-center">
+              <p className="text-gray-700 mb-3">
+                <strong>📍 Our Location:</strong> Durkkas Innovation Pvt. Ltd, MDR Nagar, Aruppukottai – 626101, Tamil Nadu, India
+              </p>
+              <a
+                href="https://www.google.com/maps/dir/?api=1&destination=MDR+Nagar,+Aruppukottai,+Tamil+Nadu+626101"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-deep-teal text-white font-semibold rounded-lg hover:bg-deep-teal/90 transition-colors shadow-md hover:shadow-lg"
+              >
+                <MapPin className="w-5 h-5" />
+                Get Directions
+              </a>
             </div>
           </div>
 

@@ -50,9 +50,24 @@ const Navbar = () => {
   ]
 
   return (
-    <nav className="bg-white shadow-md fixed left-0 right-0 z-[60]" style={{ marginBottom: 0, paddingBottom: 0, top: '2.5rem' }}>
+    <nav 
+      className="bg-white shadow-md fixed left-0 right-0 z-[60]" 
+      style={{ 
+        marginBottom: 0, 
+        paddingBottom: 0, 
+        top: '2.5rem',
+        transform: 'scale(1)',
+        transformOrigin: 'top left',
+        minHeight: '4rem'
+      }}
+    >
       <div className="max-w-7xl mx-auto px-4 md:px-8">
-        <div className="flex justify-between items-center h-16 md:h-20">
+        <div 
+          className="flex justify-between items-center h-16 md:h-20"
+          style={{ 
+            minHeight: '4rem'
+          }}
+        >
           {/* Logo */}
           <div className="flex items-center gap-2">
             <img 
@@ -90,7 +105,7 @@ const Navbar = () => {
                       </svg>
                     </button>
                     {isFeaturesOpen && (
-                      <div className="absolute left-0 mt-3 w-56 rounded-xl border border-gray-100 bg-white shadow-xl py-2">
+                      <div className="absolute left-0 mt-3 w-96 min-w-[400px] rounded-xl border border-gray-100 bg-white shadow-xl py-2">
                         {featuresMenuItems.map((feature) => (
                           <button
                             key={feature.path}

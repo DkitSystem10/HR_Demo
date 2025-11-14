@@ -126,4 +126,49 @@ input, textarea, select {
 /* Popup positioning is now handled dynamically via JavaScript in PopupBanner.jsx */
 /* This ensures accurate positioning at all zoom levels by calculating actual rendered heights */
 
+/* Prevent navbar and topbar from shrinking or zooming at any zoom level */
+nav.fixed,
+nav[class*="fixed"],
+div[class*="topbar"],
+div[class*="h-10"][class*="fixed"] {
+  transform: scale(1) !important;
+  transform-origin: top left !important;
+  min-height: fit-content !important;
+  /* Use fixed pixel values to prevent scaling */
+}
+
+/* Ensure navbar maintains fixed height at all zoom levels */
+nav.fixed > div,
+nav[class*="fixed"] > div {
+  min-height: 4rem; /* 64px for mobile */
+}
+
+@media (min-width: 768px) {
+  nav.fixed > div,
+  nav[class*="fixed"] > div {
+    min-height: 5rem; /* 80px for desktop */
+  }
+}
+
+/* Ensure topbar maintains fixed height */
+div[class*="topbar"],
+div[class*="h-10"][class*="fixed"] {
+  min-height: 2.5rem !important; /* 40px */
+  height: 2.5rem !important;
+}
+
+/* Prevent navbar logo and text from scaling */
+nav img,
+nav span {
+  transform: scale(1) !important;
+  max-width: none !important;
+}
+
+/* Ensure popup always appears above navbar */
+div[class*="popup"],
+div[class*="z-[50]"],
+div[class*="z-[55]"] {
+  z-index: 70 !important; /* Higher than navbar z-[60] */
+}
+
 

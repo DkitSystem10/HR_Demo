@@ -119,19 +119,30 @@ const Blog = () => {
               />
             </div>
             <div className="flex flex-wrap gap-2">
-              {categories.map((category) => (
-                <button
-                  key={category}
-                  onClick={() => setSelectedCategory(category)}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                    selectedCategory === category
-                      ? 'bg-primary-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  {category.charAt(0).toUpperCase() + category.slice(1).replace('-', ' ')}
-                </button>
-              ))}
+              {categories.map((category) => {
+                // Format category name: capitalize each word (e.g., 'hr-tech' -> 'HR Tech')
+                const formatCategoryName = (cat) => {
+                  if (cat === 'all') return 'All'
+                  return cat
+                    .split('-')
+                    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(' ')
+                }
+                
+                return (
+                  <button
+                    key={category}
+                    onClick={() => setSelectedCategory(category)}
+                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                      selectedCategory === category
+                        ? 'bg-primary-600 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    {formatCategoryName(category)}
+                  </button>
+                )
+              })}
             </div>
           </div>
         </div>
@@ -158,7 +169,10 @@ const Blog = () => {
                     />
                     <div className="absolute top-4 left-4">
                       <span className="bg-primary-600 text-white px-3 py-1 rounded-full text-sm font-medium">
-                        {post.category.replace('-', ' ')}
+                        {post.category
+                          .split('-')
+                          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                          .join(' ')}
                       </span>
                     </div>
                   </div>
