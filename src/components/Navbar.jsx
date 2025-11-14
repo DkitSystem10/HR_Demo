@@ -49,7 +49,7 @@ const Navbar = () => {
   ]
 
   return (
-    <nav className="bg-white shadow-md fixed left-0 right-0 z-50" style={{ marginBottom: 0, paddingBottom: 0, top: '2.5rem' }}>
+    <nav className="bg-white shadow-md fixed left-0 right-0 z-[60]" style={{ marginBottom: 0, paddingBottom: 0, top: '2.5rem' }}>
       <div className="max-w-7xl mx-auto px-4 md:px-8">
         <div className="flex justify-between items-center h-16 md:h-20">
           {/* Logo */}

@@ -49,15 +49,15 @@ const PopupBanner = () => {
 
   return (
     <>
-      {/* Backdrop */}
+      {/* Backdrop - starts below navbar (topbar: 2.5rem + navbar: 4rem mobile / 5rem desktop) */}
       <div 
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 transition-opacity duration-300"
+        className="fixed left-0 right-0 bottom-0 bg-black/60 backdrop-blur-sm z-[50] transition-opacity duration-300 md:top-[7.5rem] top-[6.5rem]"
         onClick={handleClose}
       ></div>
 
-      {/* Popup Modal */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="relative bg-navy-blue border-2 border-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
+      {/* Popup Modal - appears above backdrop but below navbar */}
+      <div className="fixed left-0 right-0 bottom-0 z-[55] flex items-center justify-center p-4 pointer-events-none md:top-[7.5rem] top-[6.5rem]">
+        <div className="relative bg-navy-blue border-2 border-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden pointer-events-auto">
           {/* Decorative Triangles - More prominent and colorful */}
           <div className="absolute top-0 left-0 w-24 h-24">
             <div className="absolute top-1 left-1 w-0 h-0 border-l-[20px] border-l-transparent border-b-[30px] border-b-accent-orange"></div>

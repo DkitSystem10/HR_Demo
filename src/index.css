@@ -8,10 +8,26 @@
   box-sizing: border-box;
 }
 
+html {
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+}
+
 body {
   font-family: 'Inter', 'Poppins', system-ui, sans-serif;
   color: #333333;
   overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+  position: relative;
+}
+
+#root {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+  position: relative;
 }
 
 /* Utilities used by Blog.jsx */
@@ -21,7 +37,59 @@ body {
   margin-right: auto;
   padding-left: 1rem;
   padding-right: 1rem;
+  width: 100%;
+  box-sizing: border-box;
 }
+
+/* Prevent overflow on all containers */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Ensure responsive containers don't overflow */
+section, div, header, footer, main, article, aside {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Prevent text overflow */
+p, h1, h2, h3, h4, h5, h6, span, a, button, input, textarea, select {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Ensure tables and forms are responsive */
+table {
+  width: 100%;
+  max-width: 100%;
+  table-layout: auto;
+}
+
+input, textarea, select {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Prevent fixed positioning from causing overflow */
+[class*="fixed"] {
+  max-width: 100vw;
+}
+
+/* Ensure grid and flex containers are responsive */
+.grid, .flex {
+  max-width: 100%;
+}
+
+/* Ensure fixed elements don't cause overflow issues */
+.fixed {
+  max-width: 100vw;
+  box-sizing: border-box;
+}
+
+/* Production-ready z-index management */
+/* Topbar: 60, Navbar: 60, ScrollToTop: 65, Popup Modal: 55, Popup Backdrop: 50 */
 
 .gradient-bg {
   background: linear-gradient(135deg, rgba(0,123,131,0.06), rgba(255,123,0,0.06));
@@ -34,4 +102,25 @@ body {
 .shadow-medium {
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
 }
+
+/* Media queries for zoom compatibility */
+@media (max-width: 320px) {
+  html {
+    font-size: 14px;
+  }
+  
+  .container-custom {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+}
+
+/* Ensure proper scaling at different zoom levels */
+@media (min-resolution: 2dppx) {
+  img {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
 

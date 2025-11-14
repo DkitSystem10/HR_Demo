@@ -10,18 +10,20 @@ import ScrollToTopOnRouteChange from './components/ScrollToTopOnRouteChange'
 
 function App() {
   return (
-    <Router>
-      <ScrollToTopOnRouteChange />
-      <ScrollToTop />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/feature/:featureId" element={<FeatureDetail />} />
-        <Route path="/pricing" element={<Pricing />} />
-        <Route path="/blog" element={<Blog />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/signup" element={<SignUp />} />
-      </Routes>
-    </Router>
+    <div className="w-full max-w-full overflow-x-hidden">
+      <Router>
+        <ScrollToTopOnRouteChange />
+        <ScrollToTop />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/feature/:featureId" element={<FeatureDetail />} />
+          <Route path="/pricing" element={<Pricing />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/signup" element={<SignUp />} />
+        </Routes>
+      </Router>
+    </div>
   )
 }
 
