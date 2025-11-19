@@ -29,23 +29,22 @@ const Navbar = () => {
     const path = location.pathname
     const hash = location.hash
     if (path === '/') {
-      if (hash === '#about') return 'About Us'
       return 'Home'
     }
     if (path.startsWith('/feature')) return 'Features'
     if (path.startsWith('/blog')) return 'Blog'
     if (path.startsWith('/pricing')) return 'Pricing'
     if (path.startsWith('/contact')) return 'Contact Us'
+    if (path.startsWith('/about')) return 'About Us'
     if (path.startsWith('/signup')) return ''
     return ''
   }, [location.pathname, location.hash])
 
   const menuItems = ['Home', 'Features', 'Pricing', 'Blog', 'About Us', 'Contact Us']
   const featuresMenuItems = [
-    { label: 'Employee Management', path: '/feature/employee-management' },
-    { label: 'Data Master', path: '/feature/data-master' },
-    { label: 'Payroll Management', path: '/feature/payroll-management' },
     { label: 'Attendance Management', path: '/feature/attendance-management' },
+    { label: 'Payroll Management', path: '/feature/payroll-management' },
+    { label: 'Statutory Management', path: '/test' },
     { label: 'Reports', path: '/feature/reports' }
   ]
 
@@ -141,22 +140,7 @@ const Navbar = () => {
                     } else if (item === 'Pricing') {
                       navigate('/pricing')
                     } else if (item === 'About Us') {
-                      if (location.pathname !== '/') {
-                        navigate('/')
-                        setTimeout(() => {
-                          const aboutSection = document.getElementById('about')
-                          if (aboutSection) {
-                            aboutSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                            try { window.location.hash = 'about' } catch {}
-                          }
-                        }, 150)
-                      } else {
-                        const aboutSection = document.getElementById('about')
-                        if (aboutSection) {
-                          aboutSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                          try { window.location.hash = 'about' } catch {}
-                        }
-                      }
+                      navigate('/about')
                     } else if (item === 'Contact Us') {
                       navigate('/contact')
                     }
@@ -177,10 +161,7 @@ const Navbar = () => {
             {/* Desktop Action Buttons */}
             <div className="flex items-center gap-3 ml-4">
               <button
-                onClick={() => {
-                  // Handle login navigation
-                  console.log('Login clicked')
-                }}
+                onClick={() => navigate('/login')}
                 className="px-6 py-2.5 bg-accent-orange text-white font-semibold rounded-lg shadow-[0_4px_0_0_#cc6200,0_6px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_2px_0_0_#cc6200,0_4px_8px_rgba(0,0,0,0.15)] hover:translate-y-0.5 transition-all duration-150 active:shadow-[0_1px_0_0_#cc6200,0_2px_4px_rgba(0,0,0,0.15)] active:translate-y-1"
               >
                 Login
@@ -285,22 +266,7 @@ const Navbar = () => {
                     } else if (item === 'Pricing') {
                       navigate('/pricing')
                     } else if (item === 'About Us') {
-                      if (location.pathname !== '/') {
-                        navigate('/')
-                        setTimeout(() => {
-                          const aboutSection = document.getElementById('about')
-                          if (aboutSection) {
-                            aboutSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                            try { window.location.hash = 'about' } catch {}
-                          }
-                        }, 150)
-                      } else {
-                        const aboutSection = document.getElementById('about')
-                        if (aboutSection) {
-                          aboutSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                          try { window.location.hash = 'about' } catch {}
-                        }
-                      }
+                      navigate('/about')
                     } else if (item === 'Contact Us') {
                       navigate('/contact')
                     }
@@ -319,8 +285,7 @@ const Navbar = () => {
               <button
                 onClick={() => {
                   setIsMobileMenuOpen(false)
-                  // Handle login navigation
-                  console.log('Login clicked')
+                  navigate('/login')
                 }}
                 className="w-full px-6 py-3 bg-accent-orange text-white font-semibold rounded-lg shadow-[0_4px_0_0_#cc6200,0_6px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_2px_0_0_#cc6200,0_4px_8px_rgba(0,0,0,0.15)] hover:translate-y-0.5 transition-all duration-150 active:shadow-[0_1px_0_0_#cc6200,0_2px_4px_rgba(0,0,0,0.15)] active:translate-y-1 text-center"
               >

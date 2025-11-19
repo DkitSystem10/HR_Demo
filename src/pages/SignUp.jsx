@@ -28,11 +28,13 @@ const SignUp = () => {
       alert('Please agree to the Terms of Service and Privacy Policy')
       return
     }
-    // Handle form submission
-    console.log('Form submitted:', formData)
-    alert('Thank you! Your free trial has been activated.')
-    // Navigate to home or dashboard
-    navigate('/')
+      // Handle form submission
+      console.log('Form submitted:', formData)
+      // Store signup status in localStorage for login validation
+      localStorage.setItem('freeTrialSignedUp', 'true')
+      alert('Thank you! Your free trial has been activated. You can now log in.')
+      // Navigate to login page
+      navigate('/login')
   }
 
   return (

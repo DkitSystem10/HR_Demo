@@ -115,7 +115,7 @@ const Footer = () => {
           {/* Copyright */}
           <div className="pt-3 border-t border-accent-orange/20 w-full max-w-2xl">
             <p className="text-gray-400 text-xs md:text-sm">
-              © 2025 Durkkas Innovation Pvt Ltd. All rights reserved.
+              © 2025 Durkkas Innovations Pvt Ltd. All rights reserved.
             </p>
           </div>
         </div>

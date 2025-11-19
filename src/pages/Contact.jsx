@@ -170,7 +170,7 @@ const Contact = () => {
                     <div>
                       <h3 className="font-semibold text-charcoal mb-1">Office Address</h3>
                       <p className="text-gray-700">
-                        Durkkas Innovation Pvt. Ltd,<br />
+                        Durkkas Innovations Pvt. Ltd,<br />
                         MDR Nagar,<br />
                         Aruppukottai – 626101
                       </p>
@@ -234,12 +234,12 @@ const Contact = () => {
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
                 className="w-full"
-                title="Durkkas Innovation Office Location - MDR Nagar, Aruppukottai"
+                title="Durkkas Innovations Office Location - MDR Nagar, Aruppukottai"
               />
             </div>
             <div className="mt-4 text-center">
               <p className="text-gray-700 mb-3">
-                <strong>📍 Our Location:</strong> Durkkas Innovation Pvt. Ltd, MDR Nagar, Aruppukottai – 626101, Tamil Nadu, India
+                <strong>📍 Our Location:</strong> Durkkas Innovations Pvt. Ltd, MDR Nagar, Aruppukottai – 626101, Tamil Nadu, India
               </p>
               <a
                 href="https://www.google.com/maps/dir/?api=1&destination=MDR+Nagar,+Aruppukottai,+Tamil+Nadu+626101"

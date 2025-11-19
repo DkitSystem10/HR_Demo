@@ -453,6 +453,7 @@ const FeatureDetail = () => {
               Experience the power of {feature.name} with a personalized demo.
             </p>
             <button 
+              onClick={() => navigate('/signup')}
               className="px-10 py-5 bg-accent-orange text-white font-semibold text-lg rounded-xl hover:bg-accent-orange/90 transition-all transform hover:scale-105 shadow-xl hover:shadow-2xl"
               aria-label="Request a demo"
             >

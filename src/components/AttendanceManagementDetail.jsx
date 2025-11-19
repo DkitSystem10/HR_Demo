@@ -1,4 +1,5 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   Clock,
   LayoutDashboard,
@@ -93,6 +94,8 @@ const integrations = [
 ]
 
 const AttendanceManagementDetail = () => {
+  const navigate = useNavigate()
+  
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#f5f9ff] via-white to-[#f9fbff]">
       <header className="relative overflow-hidden">
@@ -116,14 +119,49 @@ const AttendanceManagementDetail = () => {
               manual effort. Seamless biometric integrations, real-time dashboards, and correction workflows ensure every minute
               is accounted for across locations.
             </p>
-            <div className="mt-8 grid gap-4 sm:grid-cols-2 max-w-2xl mx-auto">
-              <div className="rounded-3xl border border-white/70 bg-white/80 backdrop-blur-lg shadow-md p-5">
-                <p className="text-sm uppercase tracking-wide text-gray-500">Coverage</p>
-                <p className="mt-2 text-2xl font-semibold text-charcoal">Branches, Shifts &amp; Remote Teams</p>
+            <div className="mt-8 grid gap-6 sm:grid-cols-2 max-w-3xl mx-auto">
+              {/* Coverage Card */}
+              <div className="group relative rounded-3xl overflow-hidden border border-white/20 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+                {/* Blurred Background Effect */}
+                <div className="absolute inset-0 bg-gradient-to-br from-deep-teal/20 via-accent-orange/10 to-deep-teal/30 blur-2xl opacity-70 group-hover:opacity-90 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-deep-teal/30 to-accent-orange/20 opacity-50"></div>
+                
+                {/* Content */}
+                <div className="relative z-10 p-6 md:p-8 bg-white/60 backdrop-blur-md">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-deep-teal to-accent-orange flex items-center justify-center shadow-lg">
+                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <p className="text-sm uppercase tracking-wide font-bold text-deep-teal">Coverage</p>
+                  </div>
+                  <p className="text-xl md:text-2xl font-bold text-charcoal leading-tight">
+                    Branches, Shifts &amp; Remote Teams
+                  </p>
+                </div>
               </div>
-              <div className="rounded-3xl border border-white/70 bg-white/80 backdrop-blur-lg shadow-md p-5">
-                <p className="text-sm uppercase tracking-wide text-gray-500">Reliability</p>
-                <p className="mt-2 text-2xl font-semibold text-charcoal">Real-Time Attendance Confidence</p>
+
+              {/* Reliability Card */}
+              <div className="group relative rounded-3xl overflow-hidden border border-white/20 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+                {/* Blurred Background Effect */}
+                <div className="absolute inset-0 bg-gradient-to-br from-accent-orange/20 via-deep-teal/10 to-accent-orange/30 blur-2xl opacity-70 group-hover:opacity-90 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-accent-orange/30 to-deep-teal/20 opacity-50"></div>
+                
+                {/* Content */}
+                <div className="relative z-10 p-6 md:p-8 bg-white/60 backdrop-blur-md">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-accent-orange to-deep-teal flex items-center justify-center shadow-lg">
+                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <p className="text-sm uppercase tracking-wide font-bold text-accent-orange">Reliability</p>
+                  </div>
+                  <p className="text-xl md:text-2xl font-bold text-charcoal leading-tight">
+                    Real-Time Attendance Confidence
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -256,6 +294,7 @@ const AttendanceManagementDetail = () => {
               Let us walk you through a personalised demo tailored to your workforce model.
             </p>
             <button
+              onClick={() => navigate('/signup')}
               className="mt-8 px-10 py-5 bg-deep-teal text-white font-semibold text-lg rounded-xl hover:bg-deep-teal/90 transition-all transform hover:scale-105 shadow-xl hover:shadow-2xl"
               aria-label="Book an attendance management demo"
             >

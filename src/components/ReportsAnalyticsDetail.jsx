@@ -1,4 +1,5 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard,
   Users,
@@ -108,6 +109,8 @@ const futureEnhancements = [
 ]
 
 const ReportsAnalyticsDetail = () => {
+  const navigate = useNavigate()
+  
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#f6f9ff] via-white to-[#f3f7ff]">
       <header className="relative overflow-hidden">
@@ -284,6 +287,7 @@ const ReportsAnalyticsDetail = () => {
               move faster.
             </p>
             <button
+              onClick={() => navigate('/signup')}
               className="mt-8 px-10 py-5 bg-deep-teal text-white font-semibold text-lg rounded-xl hover:bg-deep-teal/90 transition-all transform hover:scale-105 shadow-xl hover:shadow-2xl"
               aria-label="Request a reports and analytics demo"
             >
