@@ -469,8 +469,8 @@ const About = () => {
               </div>
 
               {/* Mobile: Letters Row at Top */}
-              <div className="lg:hidden mb-8">
-                <div className="flex justify-end items-center gap-3 md:gap-4 overflow-x-auto pb-4">
+              <div className="lg:hidden mb-6">
+                <div className="flex justify-center items-center gap-1 sm:gap-1.5 md:gap-2">
                   {frameworkData.map((item, index) => {
                     const letter = item.letter
                     const isActive = currentLetterIndex === index
@@ -478,14 +478,14 @@ const About = () => {
                     
                     return (
                       <div key={index} className="flex-shrink-0">
-                        <div className={`relative w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center transition-all duration-500 ${
+                        <div className={`relative w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-500 ${
                           isActive 
-                            ? 'scale-125 bg-gradient-to-br from-deep-teal via-accent-orange to-deep-teal shadow-lg ring-4 ring-deep-teal/20' 
+                            ? 'scale-110 bg-gradient-to-br from-deep-teal via-accent-orange to-deep-teal shadow-lg ring-2 ring-deep-teal/30' 
                             : isPast
-                            ? 'bg-deep-teal/40 scale-100 ring-2 ring-deep-teal/30'
+                            ? 'bg-deep-teal/40 scale-100 ring-1 ring-deep-teal/20'
                             : 'bg-white/10 scale-100 ring-1 ring-white/20'
                         }`}>
-                          <span className={`text-2xl md:text-3xl font-bold ${
+                          <span className={`text-base sm:text-lg md:text-xl font-bold ${
                             isActive ? 'text-white' : isPast ? 'text-white/80' : 'text-white/40'
                           }`}>
                             {letter}
@@ -511,34 +511,34 @@ const About = () => {
                       className="w-full flex flex-col lg:flex-row items-center gap-8 lg:gap-12 transition-all duration-700"
                     >
                       {/* Center - Large Letter Circle */}
-                      <div className="flex-shrink-0">
-                        <div className="relative w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 lg:w-96 lg:h-96">
+                      <div className="flex-shrink-0 w-full lg:w-auto">
+                        <div className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 lg:w-96 lg:h-96 mx-auto lg:mx-0">
                           {/* Animated Background Circle */}
                           <div className="absolute inset-0 rounded-full animate-circle-gradient overflow-hidden">
                             <div className="absolute inset-0 bg-gradient-to-br from-deep-teal via-accent-orange to-deep-teal bg-[length:200%_200%] animate-gradient-move"></div>
                           </div>
                           {/* Letter */}
                           <div className="relative w-full h-full flex items-center justify-center">
-                            <span className="text-6xl sm:text-7xl md:text-8xl lg:text-[12rem] font-black text-white drop-shadow-2xl z-10">
+                            <span className="text-4xl sm:text-5xl md:text-6xl lg:text-[12rem] font-black text-white drop-shadow-2xl z-10">
                               {letter}
                             </span>
                           </div>
                         </div>
                         {/* Title below circle on mobile */}
-                        <div className="lg:hidden mt-4 text-center">
-                          <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-white">
+                        <div className="lg:hidden mt-3 text-center">
+                          <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-white">
                             {item.title}
                           </h3>
                         </div>
                       </div>
 
                       {/* Right Side - Content */}
-                      <div className="flex-1 space-y-4 md:space-y-6 w-full">
+                      <div className="flex-1 space-y-3 sm:space-y-4 md:space-y-6 w-full mt-4 lg:mt-0">
                         <div>
                           <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-2 hidden lg:block">
                             {index + 1}. {item.letter} – {item.title}
                           </h3>
-                          <p className="text-base sm:text-lg md:text-xl font-semibold text-cyan-300 mb-4">
+                          <p className="text-sm sm:text-base md:text-lg lg:text-xl font-semibold text-cyan-300 mb-3 sm:mb-4">
                             {item.subtitle}
                           </p>
                         </div>
@@ -549,9 +549,9 @@ const About = () => {
 
                         <ul className="space-y-2 md:space-y-3">
                           {item.points.map((point, idx) => (
-                            <li key={idx} className="flex items-start gap-3">
-                              <span className="text-accent-orange text-lg sm:text-xl font-bold mt-1 flex-shrink-0">✔</span>
-                              <span className="text-sm sm:text-base md:text-lg text-gray-200">{point}</span>
+                            <li key={idx} className="flex items-start gap-2 sm:gap-3">
+                              <span className="text-accent-orange text-base sm:text-lg font-bold mt-0.5 sm:mt-1 flex-shrink-0">✔</span>
+                              <span className="text-sm sm:text-base md:text-lg text-gray-200 leading-relaxed">{point}</span>
                             </li>
                           ))}
                         </ul>

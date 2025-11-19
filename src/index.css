@@ -223,4 +223,14 @@ div[class*="z-[55]"] {
   box-shadow: 0 10px 40px rgba(0, 123, 131, 0.3), 0 5px 20px rgba(255, 123, 0, 0.2);
 }
 
+/* Hide scrollbar for mobile letters row */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 
