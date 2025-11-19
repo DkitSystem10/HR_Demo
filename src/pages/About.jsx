@@ -14,6 +14,9 @@ const About = () => {
   const scrollLockRef = useRef(false)
   const scrollPositionRef = useRef(0)
   const isPositioningRef = useRef(false)
+  const mobileCarouselRef = useRef(null)
+  const touchStartXRef = useRef(0)
+  const touchEndXRef = useRef(0)
 
   const frameworkData = [
     {
@@ -285,7 +288,53 @@ const About = () => {
     }
   }, [isAnimating, animationComplete, canAdvance, currentLetterIndex])
 
-  // Manual slide for mobile - removed auto-slide, user must scroll manually
+  // Manual carousel handlers for mobile
+  const handleSwipe = () => {
+    const swipeDistance = touchStartXRef.current - touchEndXRef.current
+    const minSwipeDistance = 50 // Minimum distance for a swipe
+    
+    if (Math.abs(swipeDistance) > minSwipeDistance) {
+      if (swipeDistance > 0) {
+        // Swipe left - next letter
+        if (currentLetterIndex < frameworkData.length - 1) {
+          setCurrentLetterIndex(currentLetterIndex + 1)
+        }
+      } else {
+        // Swipe right - previous letter
+        if (currentLetterIndex > 0) {
+          setCurrentLetterIndex(currentLetterIndex - 1)
+        }
+      }
+    }
+  }
+
+  const handleCarouselScroll = (element) => {
+    if (!element) return
+    
+    // Calculate which letter is centered based on scroll position
+    const containerWidth = element.clientWidth
+    const scrollLeft = element.scrollLeft
+    const itemWidth = 80 + 24 // width + gap (80px + 24px gap)
+    const centerPosition = scrollLeft + (containerWidth / 2)
+    const currentIndex = Math.round((centerPosition - 40) / itemWidth) // 40px is half item width
+    
+    if (currentIndex !== currentLetterIndex && currentIndex >= 0 && currentIndex < frameworkData.length) {
+      setCurrentLetterIndex(currentIndex)
+    }
+  }
+
+  // Sync carousel scroll position with currentLetterIndex on mobile
+  useEffect(() => {
+    if (mobileCarouselRef.current && window.innerWidth < 768) {
+      const containerWidth = mobileCarouselRef.current.clientWidth
+      const itemWidth = 80 + 24 // width + gap
+      const targetScroll = (currentLetterIndex * itemWidth) - (containerWidth / 2) + 40 // Center the item
+      mobileCarouselRef.current.scrollTo({
+        left: Math.max(0, targetScroll),
+        behavior: 'smooth'
+      })
+    }
+  }, [currentLetterIndex])
 
   // Intersection Observer to trigger animation - watches letters content section (below description)
   useEffect(() => {
@@ -521,25 +570,47 @@ const About = () => {
                 </div>
               </div>
 
-              {/* Mobile: Letters Row at Top */}
+              {/* Mobile: Letters Carousel */}
               <div className="lg:hidden mb-6">
-                <div className="flex justify-center items-center gap-1 sm:gap-1.5 md:gap-2">
+                <div 
+                  ref={mobileCarouselRef}
+                  className="flex items-center gap-6 sm:gap-8 overflow-x-auto snap-x snap-mandatory scrollbar-hide px-4"
+                  style={{
+                    scrollSnapType: 'x mandatory',
+                    WebkitOverflowScrolling: 'touch',
+                    scrollBehavior: 'smooth'
+                  }}
+                  onTouchStart={(e) => {
+                    touchStartXRef.current = e.touches[0].clientX
+                  }}
+                  onTouchEnd={(e) => {
+                    touchEndXRef.current = e.changedTouches[0].clientX
+                    handleSwipe()
+                  }}
+                  onScroll={(e) => {
+                    handleCarouselScroll(e.target)
+                  }}
+                >
                   {frameworkData.map((item, index) => {
                     const letter = item.letter
                     const isActive = currentLetterIndex === index
-                    const isPast = currentLetterIndex > index
                     
                     return (
-                      <div key={index} className="flex-shrink-0">
-                        <div className={`relative w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-500 ${
+                      <div 
+                        key={index} 
+                        className="flex-shrink-0 snap-center flex items-center justify-center"
+                        style={{ 
+                          width: '80px',
+                          scrollSnapAlign: 'center'
+                        }}
+                      >
+                        <div className={`relative w-16 h-16 sm:w-18 sm:h-18 rounded-full flex items-center justify-center transition-all duration-500 ${
                           isActive 
-                            ? 'scale-110 bg-gradient-to-br from-deep-teal via-accent-orange to-deep-teal shadow-lg ring-2 ring-deep-teal/30' 
-                            : isPast
-                            ? 'bg-deep-teal/40 scale-100 ring-1 ring-deep-teal/20'
+                            ? 'scale-125 bg-gradient-to-br from-deep-teal via-accent-orange to-deep-teal shadow-lg ring-4 ring-deep-teal/30' 
                             : 'bg-white/10 scale-100 ring-1 ring-white/20'
                         }`}>
-                          <span className={`text-base sm:text-lg md:text-xl font-bold ${
-                            isActive ? 'text-white' : isPast ? 'text-white/80' : 'text-white/40'
+                          <span className={`text-2xl sm:text-3xl font-bold ${
+                            isActive ? 'text-white' : 'text-white/50'
                           }`}>
                             {letter}
                           </span>
