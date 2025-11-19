@@ -14,6 +14,8 @@ const About = () => {
   const scrollLockRef = useRef(false)
   const scrollPositionRef = useRef(0)
   const isPositioningRef = useRef(false)
+  const autoScrollIntervalRef = useRef(null)
+  const isAutoScrollingRef = useRef(false)
 
   const frameworkData = [
     {
@@ -285,6 +287,68 @@ const About = () => {
     }
   }, [isAnimating, animationComplete, canAdvance, currentLetterIndex])
 
+  // Auto-slide D U R K K A S content for mobile only
+  useEffect(() => {
+    // Detect if device is mobile
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768
+    
+    if (!isMobile) return // Only on mobile
+    
+    // Auto-advance through letters on mobile when animation is active
+    if (isAnimating && !animationComplete && currentLetterIndex >= 0) {
+      if (isAutoScrollingRef.current) return // Already auto-advancing
+      
+      isAutoScrollingRef.current = true
+      
+      const advanceToNext = () => {
+        setCanAdvance((prevCanAdvance) => {
+          if (!prevCanAdvance) return prevCanAdvance
+          
+          setCurrentLetterIndex((prevIndex) => {
+            let nextIndex = prevIndex + 1
+            
+            // If reached last letter, loop back to first for infinite loop
+            if (nextIndex >= frameworkData.length) {
+              nextIndex = 0
+            }
+            
+            return nextIndex
+          })
+          
+          return false // Prevent rapid advances
+        })
+        
+        // Allow next advance after delay
+        setTimeout(() => {
+          setCanAdvance(true)
+        }, 2500) // Show each letter for 2.5 seconds
+      }
+      
+      // Start auto-advancing after initial delay
+      const timeout = setTimeout(() => {
+        const interval = setInterval(() => {
+          if (isAnimating && !animationComplete) {
+            advanceToNext()
+          } else {
+            clearInterval(interval)
+            isAutoScrollingRef.current = false
+          }
+        }, 3000) // Advance every 3 seconds
+        
+        autoScrollIntervalRef.current = interval
+      }, 2000) // Wait 2 seconds before starting auto-advance
+      
+      return () => {
+        clearTimeout(timeout)
+        if (autoScrollIntervalRef.current) {
+          clearInterval(autoScrollIntervalRef.current)
+        }
+        isAutoScrollingRef.current = false
+      }
+    } else {
+      isAutoScrollingRef.current = false
+    }
+  }, [currentLetterIndex, isAnimating, animationComplete, canAdvance])
 
   // Intersection Observer to trigger animation - watches letters content section (below description)
   useEffect(() => {
