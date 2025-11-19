@@ -168,8 +168,11 @@ const About = () => {
       }
     }
 
+    // Detect if device is mobile
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768
+
     const handleWheel = (e) => {
-      if (isAnimating && !animationComplete) {
+      if (isAnimating && !animationComplete && !isMobile) {
         e.preventDefault()
         e.stopPropagation()
         e.stopImmediatePropagation()
@@ -184,9 +187,37 @@ const About = () => {
     }
 
     const handleTouchMove = (e) => {
-      if (isAnimating && !animationComplete) {
+      if (isAnimating && !animationComplete && !isMobile) {
         e.preventDefault()
         return false
+      }
+    }
+
+    // On mobile, use scroll position to advance letters instead of locking
+    const handleMobileScroll = () => {
+      if (isMobile && isAnimating && !animationComplete && currentLetterIndex >= 0) {
+        const scrollY = window.pageYOffset || document.documentElement.scrollTop
+        const sectionTop = scrollPositionRef.current || 0
+        const scrollProgress = scrollY - sectionTop
+        
+        // Advance letter based on scroll progress (each letter after ~300px scroll)
+        const targetIndex = Math.min(
+          Math.floor(scrollProgress / 300),
+          frameworkData.length - 1
+        )
+        
+        if (targetIndex > currentLetterIndex && canAdvance) {
+          setCurrentLetterIndex(targetIndex)
+          setCanAdvance(false)
+          setTimeout(() => {
+            setCanAdvance(true)
+            if (targetIndex >= frameworkData.length - 1) {
+              setIsAnimating(false)
+              scrollLockRef.current = false
+              setAnimationComplete(true)
+            }
+          }, 300)
+        }
       }
     }
 
@@ -210,13 +241,22 @@ const About = () => {
       if (scrollPositionRef.current === 0) {
         scrollPositionRef.current = currentScroll
       }
-      window.addEventListener('wheel', handleWheel, { passive: false })
-      window.addEventListener('touchmove', handleTouchMove, { passive: false })
-      window.addEventListener('keydown', handleKeyDown, { passive: false })
-      document.body.style.overflow = 'hidden'
-      document.body.style.position = 'fixed'
-      document.body.style.top = `-${scrollPositionRef.current}px`
-      document.body.style.width = '100%'
+      
+      if (!isMobile) {
+        // Desktop: Lock scroll with fixed positioning
+        window.addEventListener('wheel', handleWheel, { passive: false })
+        window.addEventListener('touchmove', handleTouchMove, { passive: false })
+        window.addEventListener('keydown', handleKeyDown, { passive: false })
+        document.body.style.overflow = 'hidden'
+        document.body.style.position = 'fixed'
+        document.body.style.top = `-${scrollPositionRef.current}px`
+        document.body.style.width = '100%'
+      } else {
+        // Mobile: Allow scrolling and advance letters based on scroll position
+        window.addEventListener('scroll', handleMobileScroll, { passive: true })
+        window.addEventListener('keydown', handleKeyDown, { passive: false })
+        // Don't lock scroll on mobile - allow natural scrolling
+      }
       scrollLockRef.current = true
     } else if (animationComplete) {
       // Restore scroll position only after animation completes
@@ -236,9 +276,11 @@ const About = () => {
     return () => {
       window.removeEventListener('wheel', handleWheel)
       window.removeEventListener('touchmove', handleTouchMove)
+      window.removeEventListener('scroll', handleMobileScroll)
       window.removeEventListener('keydown', handleKeyDown)
       document.body.style.overflow = ''
       document.body.style.position = ''
+      document.body.style.top = ''
       document.body.style.width = ''
     }
   }, [isAnimating, animationComplete, canAdvance, currentLetterIndex])
@@ -248,6 +290,9 @@ const About = () => {
   useEffect(() => {
     if (animationComplete || isPositioningRef.current) return
 
+    // Detect if device is mobile
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -256,47 +301,54 @@ const About = () => {
           if (entry.isIntersecting && entry.boundingClientRect.top <= window.innerHeight && entry.boundingClientRect.top > -100 && currentLetterIndex === -1 && !isAnimating && !isPositioningRef.current) {
             isPositioningRef.current = true
             
-            // Calculate perfect scroll position:
-            // - Letters section should be fully visible (taking up ~85% of viewport)
-            // - Show ~8% of description section above (context)
-            // - Show ~7% of next section below (context)
-            const lettersSectionTop = entry.boundingClientRect.top + window.pageYOffset
-            const viewportHeight = window.innerHeight
-            const contextAbove = viewportHeight * 0.08 // 8% for description section above
-            const targetScrollPosition = lettersSectionTop - contextAbove
-            
-            // Prevent scroll during positioning
-            const preventScroll = (e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              return false
-            }
-            
-            window.addEventListener('wheel', preventScroll, { passive: false })
-            window.addEventListener('touchmove', preventScroll, { passive: false })
-            
-            // Smooth scroll to perfect position
-            window.scrollTo({
-              top: targetScrollPosition,
-              behavior: 'smooth'
-            })
-            
-            // Lock scroll after smooth scroll completes
-            setTimeout(() => {
-              // Remove temporary scroll prevention
-              window.removeEventListener('wheel', preventScroll)
-              window.removeEventListener('touchmove', preventScroll)
-              
-              // Lock scroll at perfect position
+            if (isMobile) {
+              // Mobile: Just start the animation, don't lock scroll
               setIsAnimating(true)
               scrollLockRef.current = true
-              // Start with first letter
               setCurrentLetterIndex(0)
               setCanAdvance(true)
-              // Save the final scroll position
               scrollPositionRef.current = window.pageYOffset || document.documentElement.scrollTop
               isPositioningRef.current = false
-            }, 700) // Wait for smooth scroll to complete
+            } else {
+              // Desktop: Calculate perfect scroll position and lock
+              const lettersSectionTop = entry.boundingClientRect.top + window.pageYOffset
+              const viewportHeight = window.innerHeight
+              const contextAbove = viewportHeight * 0.08 // 8% for description section above
+              const targetScrollPosition = lettersSectionTop - contextAbove
+              
+              // Prevent scroll during positioning
+              const preventScroll = (e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                return false
+              }
+              
+              window.addEventListener('wheel', preventScroll, { passive: false })
+              window.addEventListener('touchmove', preventScroll, { passive: false })
+              
+              // Smooth scroll to perfect position
+              window.scrollTo({
+                top: targetScrollPosition,
+                behavior: 'smooth'
+              })
+              
+              // Lock scroll after smooth scroll completes
+              setTimeout(() => {
+                // Remove temporary scroll prevention
+                window.removeEventListener('wheel', preventScroll)
+                window.removeEventListener('touchmove', preventScroll)
+                
+                // Lock scroll at perfect position
+                setIsAnimating(true)
+                scrollLockRef.current = true
+                // Start with first letter
+                setCurrentLetterIndex(0)
+                setCanAdvance(true)
+                // Save the final scroll position
+                scrollPositionRef.current = window.pageYOffset || document.documentElement.scrollTop
+                isPositioningRef.current = false
+              }, 700) // Wait for smooth scroll to complete
+            }
           }
         })
       },
