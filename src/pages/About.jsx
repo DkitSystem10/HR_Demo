@@ -508,46 +508,46 @@ const About = () => {
                   return (
                     <div
                       key={index}
-                      className="w-full flex flex-col lg:flex-row items-center gap-8 lg:gap-12 transition-all duration-700"
+                      className="w-full flex flex-col lg:flex-row items-center lg:items-start gap-4 sm:gap-6 lg:gap-12 transition-all duration-700"
                     >
                       {/* Center - Large Letter Circle */}
-                      <div className="flex-shrink-0 w-full lg:w-auto">
-                        <div className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 lg:w-96 lg:h-96 mx-auto lg:mx-0">
+                      <div className="flex-shrink-0 w-full lg:w-auto mb-4 lg:mb-0">
+                        <div className="relative w-24 h-24 sm:w-28 sm:h-28 md:w-40 md:h-40 lg:w-96 lg:h-96 mx-auto lg:mx-0">
                           {/* Animated Background Circle */}
                           <div className="absolute inset-0 rounded-full animate-circle-gradient overflow-hidden">
                             <div className="absolute inset-0 bg-gradient-to-br from-deep-teal via-accent-orange to-deep-teal bg-[length:200%_200%] animate-gradient-move"></div>
                           </div>
                           {/* Letter */}
                           <div className="relative w-full h-full flex items-center justify-center">
-                            <span className="text-4xl sm:text-5xl md:text-6xl lg:text-[12rem] font-black text-white drop-shadow-2xl z-10">
+                            <span className="text-3xl sm:text-4xl md:text-5xl lg:text-[12rem] font-black text-white drop-shadow-2xl z-10">
                               {letter}
                             </span>
                           </div>
                         </div>
                         {/* Title below circle on mobile */}
-                        <div className="lg:hidden mt-3 text-center">
-                          <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-white">
+                        <div className="lg:hidden mt-2 text-center">
+                          <h3 className="text-base sm:text-lg md:text-xl font-bold text-white">
                             {item.title}
                           </h3>
                         </div>
                       </div>
 
                       {/* Right Side - Content */}
-                      <div className="flex-1 space-y-3 sm:space-y-4 md:space-y-6 w-full mt-4 lg:mt-0">
+                      <div className="flex-1 space-y-3 sm:space-y-4 md:space-y-6 w-full text-left">
                         <div>
                           <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-2 hidden lg:block">
                             {index + 1}. {item.letter} – {item.title}
                           </h3>
-                          <p className="text-sm sm:text-base md:text-lg lg:text-xl font-semibold text-cyan-300 mb-3 sm:mb-4">
+                          <p className="text-sm sm:text-base md:text-lg lg:text-xl font-semibold text-cyan-300 mb-3 sm:mb-4 text-left">
                             {item.subtitle}
                           </p>
                         </div>
                         
-                        <p className="text-sm sm:text-base md:text-lg text-gray-200 leading-relaxed">
+                        <p className="text-sm sm:text-base md:text-lg text-gray-200 leading-relaxed text-left">
                           {item.description}
                         </p>
 
-                        <ul className="space-y-2 md:space-y-3">
+                        <ul className="space-y-2 md:space-y-3 text-left">
                           {item.points.map((point, idx) => (
                             <li key={idx} className="flex items-start gap-2 sm:gap-3">
                               <span className="text-accent-orange text-base sm:text-lg font-bold mt-0.5 sm:mt-1 flex-shrink-0">✔</span>
@@ -556,11 +556,11 @@ const About = () => {
                           ))}
                         </ul>
 
-                        <p className="text-sm sm:text-base md:text-lg text-gray-200 leading-relaxed font-medium pt-2">
+                        <p className="text-sm sm:text-base md:text-lg text-gray-200 leading-relaxed font-medium pt-2 text-left">
                           {item.footer}
                         </p>
 
-                        <div className="pt-2">
+                        <div className="pt-2 text-left">
                           <p className="text-xs sm:text-sm md:text-base text-cyan-300 font-semibold">
                             {item.modules}
                           </p>
