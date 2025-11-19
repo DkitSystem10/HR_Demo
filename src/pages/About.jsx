@@ -14,8 +14,6 @@ const About = () => {
   const scrollLockRef = useRef(false)
   const scrollPositionRef = useRef(0)
   const isPositioningRef = useRef(false)
-  const autoScrollIntervalRef = useRef(null)
-  const isAutoScrollingRef = useRef(false)
 
   const frameworkData = [
     {
