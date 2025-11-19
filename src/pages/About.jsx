@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import Topbar from '../components/Topbar'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
@@ -15,8 +15,8 @@ const About = () => {
   const scrollPositionRef = useRef(0)
   const isPositioningRef = useRef(false)
   const mobileCarouselRef = useRef(null)
-  const touchStartXRef = useRef(0)
-  const touchEndXRef = useRef(0)
+  const autoSlideIntervalRef = useRef(null)
+  const isAutoSlidingRef = useRef(false)
 
   const frameworkData = [
     {
@@ -288,53 +288,67 @@ const About = () => {
     }
   }, [isAnimating, animationComplete, canAdvance, currentLetterIndex])
 
-  // Manual carousel handlers for mobile
-  const handleSwipe = () => {
-    const swipeDistance = touchStartXRef.current - touchEndXRef.current
-    const minSwipeDistance = 50 // Minimum distance for a swipe
-    
-    if (Math.abs(swipeDistance) > minSwipeDistance) {
-      if (swipeDistance > 0) {
-        // Swipe left - next letter
-        if (currentLetterIndex < frameworkData.length - 1) {
-          setCurrentLetterIndex(currentLetterIndex + 1)
-        }
-      } else {
-        // Swipe right - previous letter
-        if (currentLetterIndex > 0) {
-          setCurrentLetterIndex(currentLetterIndex - 1)
-        }
-      }
-    }
-  }
-
-  const handleCarouselScroll = (element) => {
-    if (!element) return
-    
-    // Calculate which letter is centered based on scroll position
-    const containerWidth = element.clientWidth
-    const scrollLeft = element.scrollLeft
-    const itemWidth = 80 + 24 // width + gap (80px + 24px gap)
-    const centerPosition = scrollLeft + (containerWidth / 2)
-    const currentIndex = Math.round((centerPosition - 40) / itemWidth) // 40px is half item width
-    
-    if (currentIndex !== currentLetterIndex && currentIndex >= 0 && currentIndex < frameworkData.length) {
-      setCurrentLetterIndex(currentIndex)
-    }
-  }
-
-  // Sync carousel scroll position with currentLetterIndex on mobile
+  // Auto-slide for mobile - starts when reaching framework section
   useEffect(() => {
-    if (mobileCarouselRef.current && window.innerWidth < 768) {
-      const containerWidth = mobileCarouselRef.current.clientWidth
-      const itemWidth = 80 + 24 // width + gap
-      const targetScroll = (currentLetterIndex * itemWidth) - (containerWidth / 2) + 40 // Center the item
-      mobileCarouselRef.current.scrollTo({
-        left: Math.max(0, targetScroll),
-        behavior: 'smooth'
-      })
+    // Detect if device is mobile
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768
+    
+    if (!isMobile) return // Only on mobile
+    
+    // Only start auto-slide when animation is active (user has reached the framework section)
+    if (isAnimating && !animationComplete && currentLetterIndex >= 0 && !isAutoSlidingRef.current) {
+      isAutoSlidingRef.current = true
+      
+      const advanceToNext = () => {
+        setCanAdvance((prevCanAdvance) => {
+          if (!prevCanAdvance) return prevCanAdvance
+          
+          setCurrentLetterIndex((prevIndex) => {
+            let nextIndex = prevIndex + 1
+            
+            // If reached last letter, loop back to first for infinite loop
+            if (nextIndex >= frameworkData.length) {
+              nextIndex = 0
+            }
+            
+            return nextIndex
+          })
+          
+          return false // Prevent rapid advances
+        })
+        
+        // Allow next advance after delay (slower timing)
+        setTimeout(() => {
+          setCanAdvance(true)
+        }, 3500) // Show each letter for 3.5 seconds (slower than before)
+      }
+      
+      // Start auto-advancing after initial delay
+      const timeout = setTimeout(() => {
+        const interval = setInterval(() => {
+          if (isAnimating && !animationComplete) {
+            advanceToNext()
+          } else {
+            clearInterval(interval)
+            isAutoSlidingRef.current = false
+          }
+        }, 4000) // Advance every 4 seconds (slower timing)
+        
+        autoSlideIntervalRef.current = interval
+      }, 2500) // Wait 2.5 seconds before starting auto-advance (gives time to see 'D')
+      
+      return () => {
+        clearTimeout(timeout)
+        if (autoSlideIntervalRef.current) {
+          clearInterval(autoSlideIntervalRef.current)
+        }
+        isAutoSlidingRef.current = false
+      }
+    } else {
+      isAutoSlidingRef.current = false
     }
-  }, [currentLetterIndex])
+  }, [currentLetterIndex, isAnimating, animationComplete, canAdvance])
+
 
   // Intersection Observer to trigger animation - watches letters content section (below description)
   useEffect(() => {
@@ -570,47 +584,25 @@ const About = () => {
                 </div>
               </div>
 
-              {/* Mobile: Letters Carousel */}
-              <div className="lg:hidden mb-6">
-                <div 
-                  ref={mobileCarouselRef}
-                  className="flex items-center gap-6 sm:gap-8 overflow-x-auto snap-x snap-mandatory scrollbar-hide px-4"
-                  style={{
-                    scrollSnapType: 'x mandatory',
-                    WebkitOverflowScrolling: 'touch',
-                    scrollBehavior: 'smooth'
-                  }}
-                  onTouchStart={(e) => {
-                    touchStartXRef.current = e.touches[0].clientX
-                  }}
-                  onTouchEnd={(e) => {
-                    touchEndXRef.current = e.changedTouches[0].clientX
-                    handleSwipe()
-                  }}
-                  onScroll={(e) => {
-                    handleCarouselScroll(e.target)
-                  }}
-                >
+              {/* Mobile: Letters Row at Top */}
+              <div className="lg:hidden mb-6 w-full">
+                <div className="flex items-center justify-center gap-1 sm:gap-1.5 md:gap-2 overflow-x-auto scrollbar-hide">
                   {frameworkData.map((item, index) => {
                     const letter = item.letter
                     const isActive = currentLetterIndex === index
+                    const isPast = currentLetterIndex > index
                     
                     return (
-                      <div 
-                        key={index} 
-                        className="flex-shrink-0 snap-center flex items-center justify-center"
-                        style={{ 
-                          width: '80px',
-                          scrollSnapAlign: 'center'
-                        }}
-                      >
-                        <div className={`relative w-16 h-16 sm:w-18 sm:h-18 rounded-full flex items-center justify-center transition-all duration-500 ${
+                      <div key={index} className="flex-shrink-0">
+                        <div className={`relative w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-500 ${
                           isActive 
-                            ? 'scale-125 bg-gradient-to-br from-deep-teal via-accent-orange to-deep-teal shadow-lg ring-4 ring-deep-teal/30' 
+                            ? 'scale-110 bg-gradient-to-br from-deep-teal via-accent-orange to-deep-teal shadow-lg ring-2 ring-deep-teal/30' 
+                            : isPast
+                            ? 'bg-deep-teal/40 scale-100 ring-1 ring-deep-teal/20'
                             : 'bg-white/10 scale-100 ring-1 ring-white/20'
                         }`}>
-                          <span className={`text-2xl sm:text-3xl font-bold ${
-                            isActive ? 'text-white' : 'text-white/50'
+                          <span className={`text-base sm:text-lg md:text-xl font-bold ${
+                            isActive ? 'text-white' : isPast ? 'text-white/80' : 'text-white/40'
                           }`}>
                             {letter}
                           </span>
