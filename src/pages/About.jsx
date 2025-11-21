@@ -9,14 +9,19 @@ const About = () => {
   const [animationComplete, setAnimationComplete] = useState(false)
   const frameworkSectionRef = useRef(null)
   const lettersContentRef = useRef(null)
+  const carouselContentGridRef = useRef(null)
   const descriptionTextRef = useRef(null)
-  const nextSectionRef = useRef(null)
   const scrollLockRef = useRef(false)
   const scrollPositionRef = useRef(0)
   const isPositioningRef = useRef(false)
   const mobileCarouselRef = useRef(null)
   const autoSlideIntervalRef = useRef(null)
   const isAutoSlidingRef = useRef(false)
+  const isGoingToFooterRef = useRef(false)
+  const touchStartXRef = useRef(0)
+  const touchStartYRef = useRef(0)
+  const touchEndXRef = useRef(0)
+  const touchEndYRef = useRef(0)
 
   const frameworkData = [
     {
@@ -146,6 +151,33 @@ const About = () => {
 
   const [currentLetterIndex, setCurrentLetterIndex] = useState(-1)
   const [canAdvance, setCanAdvance] = useState(true)
+  const [isAtHeroSection, setIsAtHeroSection] = useState(false)
+  const [isSContentFullyVisible, setIsSContentFullyVisible] = useState(false)
+
+  // Handle letter click
+  const handleLetterClick = useCallback((index) => {
+    // Allow clicking when inside the D U R K K A S section
+    if (isAnimating && !animationComplete) {
+      // Set the clicked letter as active to display its content
+      setCurrentLetterIndex(index)
+      setCanAdvance(false)
+      
+      // If clicking on S (last letter), mark it as fully visible after animation
+      if (index === frameworkData.length - 1) {
+        setTimeout(() => {
+          setIsSContentFullyVisible(true)
+          setCanAdvance(true)
+        }, 600)
+      } else {
+        // Reset S visibility flag when clicking other letters
+        setIsSContentFullyVisible(false)
+        // Re-enable after animation
+        setTimeout(() => {
+          setCanAdvance(true)
+        }, 600)
+      }
+    }
+  }, [isAnimating, animationComplete])
 
   // Scroll lock and animation logic - manual scroll control
   useEffect(() => {
@@ -155,34 +187,137 @@ const About = () => {
         const nextIndex = currentLetterIndex + 1
         setCurrentLetterIndex(nextIndex)
         
-        // Allow next scroll after animation completes
-        setTimeout(() => {
-          setCanAdvance(true)
-          
-          // If all letters shown, unlock scroll
-          if (nextIndex >= frameworkData.length - 1) {
-            setTimeout(() => {
-              setIsAnimating(false)
-              scrollLockRef.current = false
-              setAnimationComplete(true)
-            }, 300)
-          }
-        }, 600) // Animation duration
+        // If reached S (last letter), mark it as fully visible after animation
+        if (nextIndex === frameworkData.length - 1) {
+          setTimeout(() => {
+            setIsSContentFullyVisible(true)
+            setCanAdvance(true)
+          }, 600) // Animation duration - S content is now fully visible
+        } else {
+          // Allow next scroll after animation completes
+          setTimeout(() => {
+            setCanAdvance(true)
+          }, 600) // Animation duration
+        }
       }
     }
 
     // Detect if device is mobile
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768
 
+    const showPreviousLetter = () => {
+      if (currentLetterIndex > 0) {
+        // Allow scroll up even if canAdvance is false (for first scroll up)
+        setCanAdvance(false)
+        const prevIndex = currentLetterIndex - 1
+        setCurrentLetterIndex(prevIndex)
+        
+        // Reset S content visibility flag when leaving S
+        if (currentLetterIndex === frameworkData.length - 1) {
+          setIsSContentFullyVisible(false)
+        }
+        
+        // Allow next scroll after animation completes
+        setTimeout(() => {
+          setCanAdvance(true)
+        }, 600) // Animation duration
+      }
+    }
+
     const handleWheel = (e) => {
       if (isAnimating && !animationComplete && !isMobile) {
+        // If on last letter (S) and scrolling down, unlock scroll to allow page to scroll down to footer
+        // Only allow if S content is fully visible
+        if (currentLetterIndex === frameworkData.length - 1 && e.deltaY > 0 && canAdvance && isSContentFullyVisible) {
+          // Set flag to prevent scroll position restoration
+          isGoingToFooterRef.current = true
+          
+          // Unlock scroll and restore normal scrolling
+          setIsAnimating(false)
+          scrollLockRef.current = false
+          setAnimationComplete(true)
+          setIsSContentFullyVisible(false) // Reset flag
+          
+          // Restore body styles first
+          document.body.style.overflow = ''
+          document.body.style.position = ''
+          document.body.style.top = ''
+          document.body.style.width = ''
+          
+          // Get current scroll position and scroll down to footer
+          const currentScrollTop = scrollPositionRef.current || (window.pageYOffset || document.documentElement.scrollTop)
+          
+          // Restore scroll position first, then allow natural scroll to continue to footer
+          requestAnimationFrame(() => {
+            window.scrollTo({
+              top: currentScrollTop,
+              behavior: 'auto'
+            })
+            
+            // Reset flag after a delay to allow scroll to footer
+            setTimeout(() => {
+              isGoingToFooterRef.current = false
+            }, 1000)
+          })
+          
+          // Allow normal scroll to continue down to footer
+          return true
+        }
+        
+        // If on S but content not fully visible yet, prevent scroll down
+        if (currentLetterIndex === frameworkData.length - 1 && e.deltaY > 0 && !isSContentFullyVisible) {
+          e.preventDefault()
+          e.stopPropagation()
+          e.stopImmediatePropagation()
+          return false
+        }
+        
+        // If on first letter (D) and scrolling up, go directly to hero section
+        if (currentLetterIndex === 0 && e.deltaY < 0) {
+          // Set flag first to prevent scroll restoration
+          setIsAtHeroSection(true)
+          
+          // Unlock scroll and restore normal scrolling
+          setIsAnimating(false)
+          scrollLockRef.current = false
+          
+          // Restore body styles first
+          document.body.style.overflow = ''
+          document.body.style.position = ''
+          document.body.style.top = ''
+          document.body.style.width = ''
+          
+          // Get hero section position before setting animationComplete
+          const heroSectionTop = frameworkSectionRef.current?.offsetTop || 0
+          
+          // Set animationComplete after restoring styles to prevent scroll restoration
+          setAnimationComplete(true)
+          
+          // Scroll to the Durkkas Business Framework hero section immediately
+          // Account for navbar/topbar height (typically ~100-120px) to ensure heading is clearly visible
+          requestAnimationFrame(() => {
+            const navbarHeight = 120 // Approximate navbar + topbar height
+            window.scrollTo({
+              top: heroSectionTop - navbarHeight, // Offset to ensure heading is clearly visible
+              behavior: 'smooth'
+            })
+          })
+          
+          // Allow normal scroll to continue
+          return true
+        }
+        
         e.preventDefault()
         e.stopPropagation()
         e.stopImmediatePropagation()
         
-        // Only handle scroll down to advance animation
+        // Handle scroll down to advance animation (within section)
         if (e.deltaY > 0 && canAdvance) {
           showNextLetter()
+        }
+        // Handle scroll up to go to previous letter (within section, except from D)
+        else if (e.deltaY < 0 && currentLetterIndex > 0) {
+          showPreviousLetter()
         }
         
         return false
@@ -196,30 +331,128 @@ const About = () => {
       }
     }
 
-    // On mobile, use scroll position to advance letters instead of locking
-    const handleMobileScroll = () => {
+    // Mobile swipe handlers for carousel
+    const handleMobileTouchStart = (e) => {
       if (isMobile && isAnimating && !animationComplete && currentLetterIndex >= 0) {
-        const scrollY = window.pageYOffset || document.documentElement.scrollTop
-        const sectionTop = scrollPositionRef.current || 0
-        const scrollProgress = scrollY - sectionTop
+        touchStartXRef.current = e.touches[0].clientX
+        touchStartYRef.current = e.touches[0].clientY
+      }
+    }
+
+    const handleMobileTouchMove = (e) => {
+      if (isMobile && isAnimating && !animationComplete && currentLetterIndex >= 0) {
+        touchEndXRef.current = e.touches[0].clientX
+        touchEndYRef.current = e.touches[0].clientY
         
-        // Advance letter based on scroll progress (each letter after ~300px scroll)
-        const targetIndex = Math.min(
-          Math.floor(scrollProgress / 300),
-          frameworkData.length - 1
-        )
+        const horizontalDistance = Math.abs(touchStartXRef.current - touchEndXRef.current)
+        const verticalDistance = Math.abs(touchStartYRef.current - touchEndYRef.current)
         
-        if (targetIndex > currentLetterIndex && canAdvance) {
-          setCurrentLetterIndex(targetIndex)
-          setCanAdvance(false)
-          setTimeout(() => {
-            setCanAdvance(true)
-            if (targetIndex >= frameworkData.length - 1) {
-              setIsAnimating(false)
-              scrollLockRef.current = false
-              setAnimationComplete(true)
+        // Only prevent default if it's a horizontal swipe (for carousel navigation)
+        // Allow vertical scrolling to work normally
+        if (horizontalDistance > 10 && horizontalDistance > verticalDistance) {
+          e.preventDefault()
+          e.stopPropagation()
+        }
+        // Otherwise, allow normal vertical scrolling
+      }
+    }
+
+    const handleMobileTouchEnd = (e) => {
+      if (isMobile && isAnimating && !animationComplete && currentLetterIndex >= 0) {
+        const swipeDistance = touchStartXRef.current - touchEndXRef.current
+        const verticalDistance = touchStartYRef.current - touchEndYRef.current
+        
+        // If on S and swiping down vertically, allow scrolling to footer
+        if (currentLetterIndex === frameworkData.length - 1 && isSContentFullyVisible && verticalDistance < -50 && Math.abs(verticalDistance) > Math.abs(swipeDistance)) {
+          // Unlock scroll and allow scrolling to footer
+          isGoingToFooterRef.current = true
+          setIsAnimating(false)
+          scrollLockRef.current = false
+          setAnimationComplete(true)
+          setIsSContentFullyVisible(false)
+          
+          // Restore body styles
+          document.body.style.overflow = ''
+          document.body.style.position = ''
+          document.body.style.top = ''
+          document.body.style.width = ''
+          
+          // Restore scroll position and allow natural scroll to footer
+          const currentScrollTop = scrollPositionRef.current || (window.pageYOffset || document.documentElement.scrollTop)
+          requestAnimationFrame(() => {
+            window.scrollTo({
+              top: currentScrollTop,
+              behavior: 'auto'
+            })
+            setTimeout(() => {
+              isGoingToFooterRef.current = false
+            }, 1000)
+          })
+          return
+        }
+        
+        // Process vertical swipes for carousel navigation
+        if (Math.abs(verticalDistance) > 50 && Math.abs(verticalDistance) > Math.abs(swipeDistance)) {
+          // Swipe up - go to previous letter
+          if (verticalDistance > 0 && currentLetterIndex > 0) {
+            const prevIndex = currentLetterIndex - 1
+            setCurrentLetterIndex(prevIndex)
+            setIsSContentFullyVisible(false) // Reset S visibility when going back
+            setCanAdvance(false)
+            setTimeout(() => {
+              setCanAdvance(true)
+            }, 600)
+          }
+          // Swipe down - go to next letter (only if not on last letter)
+          else if (verticalDistance < 0 && currentLetterIndex < frameworkData.length - 1 && canAdvance) {
+            const nextIndex = currentLetterIndex + 1
+            setCurrentLetterIndex(nextIndex)
+            setCanAdvance(false)
+            
+            // If reached S, mark it as fully visible after animation
+            if (nextIndex === frameworkData.length - 1) {
+              setTimeout(() => {
+                setIsSContentFullyVisible(true)
+                setCanAdvance(true)
+              }, 600)
+            } else {
+              setTimeout(() => {
+                setCanAdvance(true)
+              }, 600)
             }
-          }, 300)
+          }
+        }
+        
+        // Process horizontal swipes for carousel navigation
+        if (Math.abs(swipeDistance) > 50 && Math.abs(swipeDistance) > Math.abs(verticalDistance)) {
+          // Swipe left - go to next letter
+          if (swipeDistance > 0 && currentLetterIndex < frameworkData.length - 1 && canAdvance) {
+            const nextIndex = currentLetterIndex + 1
+            setCurrentLetterIndex(nextIndex)
+            setCanAdvance(false)
+            
+            // If reached S, mark it as fully visible after animation
+            if (nextIndex === frameworkData.length - 1) {
+              setTimeout(() => {
+                setIsSContentFullyVisible(true)
+                setCanAdvance(true)
+              }, 600)
+            } else {
+              setTimeout(() => {
+                setCanAdvance(true)
+              }, 600)
+            }
+          }
+          // Swipe right - go to previous letter
+          else if (swipeDistance < 0 && currentLetterIndex > 0) {
+            const prevIndex = currentLetterIndex - 1
+            setCurrentLetterIndex(prevIndex)
+            setIsSContentFullyVisible(false) // Reset S visibility when going back
+            setCanAdvance(false)
+            setTimeout(() => {
+              setCanAdvance(true)
+            }, 600)
+          }
         }
       }
     }
@@ -227,12 +460,91 @@ const About = () => {
     const handleKeyDown = (e) => {
       if (isAnimating && !animationComplete) {
         if (['ArrowDown', 'PageDown', 'Space'].includes(e.key) && canAdvance) {
+          // If on last letter (S) and pressing down, unlock scroll to allow page to scroll down to footer
+          // Only allow if S content is fully visible
+          if (currentLetterIndex === frameworkData.length - 1 && isSContentFullyVisible) {
+            // Set flag to prevent scroll position restoration
+            isGoingToFooterRef.current = true
+            
+            // Unlock scroll and restore normal scrolling
+            setIsAnimating(false)
+            scrollLockRef.current = false
+            setAnimationComplete(true)
+            setIsSContentFullyVisible(false) // Reset flag
+            
+            // Restore body styles first
+            document.body.style.overflow = ''
+            document.body.style.position = ''
+            document.body.style.top = ''
+            document.body.style.width = ''
+            
+            // Get current scroll position
+            const currentScrollTop = scrollPositionRef.current || (window.pageYOffset || document.documentElement.scrollTop)
+            
+            // Restore scroll position first, then allow natural scroll to continue to footer
+            requestAnimationFrame(() => {
+              window.scrollTo({
+                top: currentScrollTop,
+                behavior: 'auto'
+              })
+              
+              // Reset flag after a delay to allow scroll to footer
+              setTimeout(() => {
+                isGoingToFooterRef.current = false
+              }, 1000)
+            })
+            
+            return true
+          }
+          // If on S but content not fully visible yet, prevent scroll down
+          if (currentLetterIndex === frameworkData.length - 1 && !isSContentFullyVisible) {
+            e.preventDefault()
+            e.stopPropagation()
+            return false
+          }
+          // Within section - advance to next letter
           e.preventDefault()
           e.stopPropagation()
           showNextLetter()
           return false
         } else if (['ArrowUp', 'PageUp'].includes(e.key)) {
+          // If on first letter (D) and pressing up, go directly to hero section
+          if (currentLetterIndex === 0) {
+            // Set flag first to prevent scroll restoration
+            setIsAtHeroSection(true)
+            
+            // Unlock scroll and restore normal scrolling
+            setIsAnimating(false)
+            scrollLockRef.current = false
+            
+            // Restore body styles first
+            document.body.style.overflow = ''
+            document.body.style.position = ''
+            document.body.style.top = ''
+            document.body.style.width = ''
+            
+            // Get hero section position before setting animationComplete
+            const heroSectionTop = frameworkSectionRef.current?.offsetTop || 0
+            
+            // Set animationComplete after restoring styles to prevent scroll restoration
+            setAnimationComplete(true)
+            
+            // Scroll to the Durkkas Business Framework hero section immediately
+            // Account for navbar/topbar height (typically ~100-120px) to ensure heading is clearly visible
+            requestAnimationFrame(() => {
+              const navbarHeight = 120 // Approximate navbar + topbar height
+              window.scrollTo({
+                top: heroSectionTop - navbarHeight, // Offset to ensure heading is clearly visible
+                behavior: 'smooth'
+              })
+            })
+            
+            return true
+          }
+          // From any other letter, go to previous letter
           e.preventDefault()
+          e.stopPropagation()
+          showPreviousLetter()
           return false
         }
       }
@@ -255,104 +567,144 @@ const About = () => {
         document.body.style.top = `-${scrollPositionRef.current}px`
         document.body.style.width = '100%'
       } else {
-        // Mobile: Allow scrolling and advance letters based on scroll position
-        window.addEventListener('scroll', handleMobileScroll, { passive: true })
+        // Mobile: Allow normal scrolling, but enable swipe carousel
+        const contentArea = lettersContentRef.current
+        const carouselGrid = carouselContentGridRef.current
+        if (contentArea) {
+          contentArea.addEventListener('touchstart', handleMobileTouchStart, { passive: true })
+          contentArea.addEventListener('touchmove', handleMobileTouchMove, { passive: false })
+          contentArea.addEventListener('touchend', handleMobileTouchEnd, { passive: true })
+        }
+        // Also attach to carousel grid for better swipe detection
+        if (carouselGrid) {
+          carouselGrid.addEventListener('touchstart', handleMobileTouchStart, { passive: true })
+          carouselGrid.addEventListener('touchmove', handleMobileTouchMove, { passive: false })
+          carouselGrid.addEventListener('touchend', handleMobileTouchEnd, { passive: true })
+        }
         window.addEventListener('keydown', handleKeyDown, { passive: false })
-        // Don't lock scroll on mobile - allow natural scrolling
+        // Don't lock scroll on mobile - allow normal scrolling
       }
       scrollLockRef.current = true
-    } else if (animationComplete) {
-      // Restore scroll position only after animation completes
-      document.body.style.overflow = ''
-      document.body.style.position = ''
-      document.body.style.top = ''
-      document.body.style.width = ''
-      const savedPosition = scrollPositionRef.current
-      setTimeout(() => {
-        window.scrollTo({
-          top: savedPosition,
-          behavior: 'smooth'
-        })
-      }, 50)
+    } else if (animationComplete && !isAtHeroSection && !isGoingToFooterRef.current) {
+      // Restore scroll position only after animation completes (but not when going to hero section or footer)
+      // Only restore on desktop - mobile never locks scroll
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768
+      if (!isMobile) {
+        document.body.style.overflow = ''
+        document.body.style.position = ''
+        document.body.style.top = ''
+        document.body.style.width = ''
+        const savedPosition = scrollPositionRef.current
+        setTimeout(() => {
+          window.scrollTo({
+            top: savedPosition,
+            behavior: 'smooth'
+          })
+        }, 50)
+      }
     }
 
     return () => {
       window.removeEventListener('wheel', handleWheel)
       window.removeEventListener('touchmove', handleTouchMove)
-      window.removeEventListener('scroll', handleMobileScroll)
       window.removeEventListener('keydown', handleKeyDown)
+      // Remove mobile touch listeners
+      const contentArea = lettersContentRef.current
+      const carouselGrid = carouselContentGridRef.current
+      if (contentArea) {
+        contentArea.removeEventListener('touchstart', handleMobileTouchStart)
+        contentArea.removeEventListener('touchmove', handleMobileTouchMove)
+        contentArea.removeEventListener('touchend', handleMobileTouchEnd)
+      }
+      if (carouselGrid) {
+        carouselGrid.removeEventListener('touchstart', handleMobileTouchStart)
+        carouselGrid.removeEventListener('touchmove', handleMobileTouchMove)
+        carouselGrid.removeEventListener('touchend', handleMobileTouchEnd)
+      }
       document.body.style.overflow = ''
       document.body.style.position = ''
       document.body.style.top = ''
       document.body.style.width = ''
     }
-  }, [isAnimating, animationComplete, canAdvance, currentLetterIndex])
+  }, [isAnimating, animationComplete, canAdvance, currentLetterIndex, isAtHeroSection])
 
-  // Auto-slide for mobile - starts when reaching framework section
+  // Handle scrolling from hero section back to letters section
   useEffect(() => {
-    // Detect if device is mobile
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768
-    
-    if (!isMobile) return // Only on mobile
-    
-    // Only start auto-slide when animation is active (user has reached the framework section)
-    if (isAnimating && !animationComplete && currentLetterIndex >= 0 && !isAutoSlidingRef.current) {
-      isAutoSlidingRef.current = true
-      
-      const advanceToNext = () => {
-        setCanAdvance((prevCanAdvance) => {
-          if (!prevCanAdvance) return prevCanAdvance
-          
-          setCurrentLetterIndex((prevIndex) => {
-            let nextIndex = prevIndex + 1
-            
-            // If reached last letter, loop back to first for infinite loop
-            if (nextIndex >= frameworkData.length) {
-              nextIndex = 0
-            }
-            
-            return nextIndex
-          })
-          
-          return false // Prevent rapid advances
-        })
-        
-        // Allow next advance after delay (slower timing)
-        setTimeout(() => {
-          setCanAdvance(true)
-        }, 3500) // Show each letter for 3.5 seconds (slower than before)
-      }
-      
-      // Start auto-advancing after initial delay
-      const timeout = setTimeout(() => {
-        const interval = setInterval(() => {
-          if (isAnimating && !animationComplete) {
-            advanceToNext()
-          } else {
-            clearInterval(interval)
-            isAutoSlidingRef.current = false
-          }
-        }, 4000) // Advance every 4 seconds (slower timing)
-        
-        autoSlideIntervalRef.current = interval
-      }, 2500) // Wait 2.5 seconds before starting auto-advance (gives time to see 'D')
-      
-      return () => {
-        clearTimeout(timeout)
-        if (autoSlideIntervalRef.current) {
-          clearInterval(autoSlideIntervalRef.current)
-        }
-        isAutoSlidingRef.current = false
-      }
-    } else {
-      isAutoSlidingRef.current = false
-    }
-  }, [currentLetterIndex, isAnimating, animationComplete, canAdvance])
+    if (!isAtHeroSection || isAnimating) return
 
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768
+    if (isMobile) return
+
+    const returnToLettersSection = () => {
+      // Re-enable animation and return to letters section
+      setIsAtHeroSection(false)
+      setIsAnimating(true)
+      scrollLockRef.current = true
+      setAnimationComplete(false)
+      setCurrentLetterIndex(0)
+      setCanAdvance(true)
+
+      // Lock scroll and scroll to letters section
+      const currentScroll = window.pageYOffset || document.documentElement.scrollTop
+      scrollPositionRef.current = lettersContentRef.current?.offsetTop || currentScroll
+
+      document.body.style.overflow = 'hidden'
+      document.body.style.position = 'fixed'
+      document.body.style.top = `-${scrollPositionRef.current}px`
+      document.body.style.width = '100%'
+
+      setTimeout(() => {
+        window.scrollTo({
+          top: scrollPositionRef.current,
+          behavior: 'smooth'
+        })
+      }, 50)
+    }
+
+    const handleHeroScroll = (e) => {
+      // If scrolling down from hero section, return to D U R K K A S section
+      if (e.deltaY > 0) {
+        e.preventDefault()
+        e.stopPropagation()
+        e.stopImmediatePropagation()
+        returnToLettersSection()
+        return false
+      }
+    }
+
+    const handleHeroKeyDown = (e) => {
+      // If pressing ArrowDown from hero section, return to letters section
+      if (['ArrowDown', 'PageDown', 'Space'].includes(e.key)) {
+        e.preventDefault()
+        e.stopPropagation()
+        returnToLettersSection()
+        return false
+      }
+    }
+
+    window.addEventListener('wheel', handleHeroScroll, { passive: false })
+    window.addEventListener('keydown', handleHeroKeyDown, { passive: false })
+
+    return () => {
+      window.removeEventListener('wheel', handleHeroScroll)
+      window.removeEventListener('keydown', handleHeroKeyDown)
+    }
+  }, [isAtHeroSection, isAnimating])
+
+  // Auto-slide disabled - manual swipe carousel only for mobile
+  // Users must manually swipe through D U R K K A S letters
+
+  // Ensure currentLetterIndex is set when carousel becomes active
+  useEffect(() => {
+    if (isAnimating && !animationComplete && currentLetterIndex === -1) {
+      setCurrentLetterIndex(0)
+      setCanAdvance(true)
+    }
+  }, [isAnimating, animationComplete, currentLetterIndex])
 
   // Intersection Observer to trigger animation - watches letters content section (below description)
   useEffect(() => {
-    if (animationComplete || isPositioningRef.current) return
+    if (animationComplete || isPositioningRef.current || isAtHeroSection) return
 
     // Detect if device is mobile
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768
@@ -360,9 +712,15 @@ const About = () => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          // Trigger when the letters section starts to appear (top edge enters viewport)
-          // This ensures normal scrolling works until this section appears
-          if (entry.isIntersecting && entry.boundingClientRect.top <= window.innerHeight && entry.boundingClientRect.top > -100 && currentLetterIndex === -1 && !isAnimating && !isPositioningRef.current) {
+          // Trigger only when the carousel content (D U R K K A S letters) is actually visible in viewport
+          // Wait until content is significantly visible, not just when section header appears
+          // This ensures scrolling continues through "Durkkas Business Framework" header section
+          const isContentVisible = entry.isIntersecting && 
+            entry.boundingClientRect.top < window.innerHeight * 0.8 && 
+            entry.boundingClientRect.top > -100 &&
+            entry.boundingClientRect.bottom > window.innerHeight * 0.2
+          
+          if (isContentVisible && currentLetterIndex === -1 && !isAnimating && !isPositioningRef.current) {
             isPositioningRef.current = true
             
             if (isMobile) {
@@ -416,10 +774,10 @@ const About = () => {
           }
         })
       },
-      { threshold: 0, rootMargin: '0px' }
+      { threshold: [0, 0.3, 0.5], rootMargin: '0px' }
     )
 
-    const currentRef = lettersContentRef.current
+    const currentRef = carouselContentGridRef.current
     if (currentRef) {
       observer.observe(currentRef)
     }
@@ -429,7 +787,7 @@ const About = () => {
         observer.unobserve(currentRef)
       }
     }
-  }, [currentLetterIndex, isAnimating, animationComplete])
+  }, [currentLetterIndex, isAnimating, animationComplete, isAtHeroSection])
 
   return (
     <div className="min-h-screen bg-white">
@@ -524,7 +882,7 @@ const About = () => {
       </div>
 
       {/* DURKKAS Business Framework Section - Separate Topic */}
-      <section className="relative pt-4 md:pt-6 lg:pt-8 pb-0 overflow-hidden bg-white">
+      <section ref={frameworkSectionRef} className="relative pt-4 md:pt-6 lg:pt-8 pb-0 overflow-hidden bg-white">
         <div className="max-w-7xl mx-auto px-4 md:px-8 relative z-10">
           {/* Section Header */}
           <div className="text-center mb-12 md:mb-16">
@@ -545,12 +903,12 @@ const About = () => {
       {/* Separate Section for Framework Letters Animation */}
       <section 
         ref={lettersContentRef} 
-        className="relative pt-16 md:pt-20 lg:pt-24 pb-16 md:pb-20 lg:pb-24 overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900"
+        className="relative pt-8 md:pt-12 lg:pt-16 pb-8 md:pb-12 lg:pb-16 overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900"
       >
         <div className="max-w-7xl mx-auto px-4 md:px-8 relative z-10">
           {/* Framework Letters Animation */}
-          <div className="relative min-h-[600px] md:min-h-[700px]">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+          <div className="relative min-h-[400px] md:min-h-[500px]">
+            <div ref={carouselContentGridRef} className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
               {/* Left Sidebar - Timeline (Desktop Only) */}
               <div className="hidden lg:flex lg:col-span-2 flex-col items-start">
                 <div className="relative flex flex-col items-start gap-4 lg:gap-6 py-4">
@@ -565,13 +923,15 @@ const About = () => {
                     return (
                       <div key={index} className="relative flex items-center gap-6 z-10">
                         {/* Circle */}
-                        <div className={`relative w-14 h-14 rounded-full flex items-center justify-center transition-all duration-500 ${
-                          isActive 
-                            ? 'scale-125 bg-gradient-to-br from-deep-teal via-accent-orange to-deep-teal shadow-lg ring-4 ring-deep-teal/20' 
-                            : isPast
-                            ? 'bg-deep-teal/40 scale-100 ring-2 ring-deep-teal/30'
-                            : 'bg-white/10 scale-100 ring-1 ring-white/20'
-                        }`}>
+                        <div 
+                          onClick={() => handleLetterClick(index)}
+                          className={`relative w-14 h-14 rounded-full flex items-center justify-center transition-all duration-500 cursor-pointer hover:scale-110 ${
+                            isActive 
+                              ? 'scale-125 bg-gradient-to-br from-deep-teal via-accent-orange to-deep-teal shadow-lg ring-4 ring-deep-teal/20' 
+                              : isPast
+                              ? 'bg-deep-teal/40 scale-100 ring-2 ring-deep-teal/30'
+                              : 'bg-white/10 scale-100 ring-1 ring-white/20'
+                          }`}>
                           <span className={`text-2xl font-bold ${
                             isActive ? 'text-white' : isPast ? 'text-white' : 'text-white/60'
                           }`}>
@@ -594,13 +954,15 @@ const About = () => {
                     
                     return (
                       <div key={index} className="flex-shrink-0">
-                        <div className={`relative w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-500 ${
-                          isActive 
-                            ? 'scale-110 bg-gradient-to-br from-deep-teal via-accent-orange to-deep-teal shadow-lg ring-2 ring-deep-teal/30' 
-                            : isPast
-                            ? 'bg-deep-teal/40 scale-100 ring-1 ring-deep-teal/20'
-                            : 'bg-white/10 scale-100 ring-1 ring-white/20'
-                        }`}>
+                        <div 
+                          onClick={() => handleLetterClick(index)}
+                          className={`relative w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-500 cursor-pointer hover:scale-110 ${
+                            isActive 
+                              ? 'scale-110 bg-gradient-to-br from-deep-teal via-accent-orange to-deep-teal shadow-lg ring-2 ring-deep-teal/30' 
+                              : isPast
+                              ? 'bg-deep-teal/40 scale-100 ring-1 ring-deep-teal/20'
+                              : 'bg-white/10 scale-100 ring-1 ring-white/20'
+                          }`}>
                           <span className={`text-base sm:text-lg md:text-xl font-bold ${
                             isActive ? 'text-white' : isPast ? 'text-white/80' : 'text-white/40'
                           }`}>
@@ -612,19 +974,77 @@ const About = () => {
                   })}
                 </div>
               </div>
+              
 
               {/* Center and Right - Main Content Area */}
-              <div className="lg:col-span-10 w-full">
+              <div className="lg:col-span-10 w-full min-h-[400px] relative px-12 sm:px-14 md:px-16 lg:px-0">
+                {/* Mobile: Left Arrow Button */}
+                {currentLetterIndex > 0 && (
+                  <button
+                    onClick={() => {
+                      if (currentLetterIndex > 0 && canAdvance) {
+                        const prevIndex = currentLetterIndex - 1
+                        setCurrentLetterIndex(prevIndex)
+                        setIsSContentFullyVisible(false)
+                        setCanAdvance(false)
+                        setTimeout(() => {
+                          setCanAdvance(true)
+                        }, 600)
+                      }
+                    }}
+                    className="lg:hidden absolute left-0 sm:left-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-all duration-300 active:scale-95 shadow-lg"
+                    aria-label="Previous letter"
+                  >
+                    <svg className="w-6 h-6 sm:w-7 sm:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+                )}
+                
+                {/* Mobile: Right Arrow Button */}
+                {currentLetterIndex < frameworkData.length - 1 && (
+                  <button
+                    onClick={() => {
+                      if (currentLetterIndex < frameworkData.length - 1 && canAdvance) {
+                        const nextIndex = currentLetterIndex + 1
+                        setCurrentLetterIndex(nextIndex)
+                        setCanAdvance(false)
+                        
+                        if (nextIndex === frameworkData.length - 1) {
+                          setTimeout(() => {
+                            setIsSContentFullyVisible(true)
+                            setCanAdvance(true)
+                          }, 600)
+                        } else {
+                          setTimeout(() => {
+                            setCanAdvance(true)
+                          }, 600)
+                        }
+                      }
+                    }}
+                    className="lg:hidden absolute right-0 sm:right-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-all duration-300 active:scale-95 shadow-lg"
+                    aria-label="Next letter"
+                  >
+                    <svg className="w-6 h-6 sm:w-7 sm:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                )}
+                
                 {frameworkData.map((item, index) => {
                   const letter = item.letter
-                  const isActive = currentLetterIndex === index
+                  // Show content if it's the active letter
+                  // If carousel is active but currentLetterIndex is -1, default to showing first letter (index 0)
+                  const activeIndex = currentLetterIndex >= 0 ? currentLetterIndex : (isAnimating && !animationComplete ? 0 : -1)
+                  const isActive = activeIndex === index
                   
-                  if (!isActive) return null
+                  if (!isActive || activeIndex === -1) return null
                   
                   return (
                     <div
                       key={index}
                       className="w-full flex flex-col lg:flex-row items-center lg:items-start gap-4 sm:gap-6 lg:gap-12 transition-all duration-700"
+                      style={{ WebkitTouchCallout: 'none', WebkitUserSelect: 'none' }}
                     >
                       {/* Center - Large Letter Circle */}
                       <div className="flex-shrink-0 w-full lg:w-auto mb-4 lg:mb-0">
@@ -689,17 +1109,6 @@ const About = () => {
             </div>
           </div>
 
-        </div>
-      </section>
-
-      {/* Framework Description Section */}
-      <section ref={nextSectionRef} className="relative py-16 md:py-20 lg:py-24 overflow-hidden bg-white">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 relative z-10">
-          <div className="text-center">
-            <p className="text-base md:text-lg text-black max-w-4xl mx-auto leading-relaxed">
-              Every module inside the HRMS is connected to one stage of this framework, making the system easier to use, more reliable, and ready for future growth.
-            </p>
-          </div>
         </div>
       </section>
 
