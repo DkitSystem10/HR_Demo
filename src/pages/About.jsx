@@ -366,9 +366,9 @@ const About = () => {
         const verticalDistance = Math.abs(touchStartYRef.current - touchEndYRef.current)
         
         // Only prevent default if it's a clear horizontal swipe (for carousel navigation)
-        // Use stricter threshold to avoid interfering with normal page scrolling
-        // Horizontal distance must be significantly greater than vertical (2x ratio)
-        if (horizontalDistance > 20 && horizontalDistance > verticalDistance * 2) {
+        // Use 1.5x ratio to match touch end handler for consistency
+        // This allows manual swipes while preventing interference with normal page scrolling
+        if (horizontalDistance > 15 && horizontalDistance > verticalDistance * 1.5) {
           e.preventDefault()
           e.stopPropagation()
         }
@@ -422,13 +422,14 @@ const About = () => {
         // Determine primary swipe direction
         const absHorizontal = Math.abs(swipeDistance)
         const absVertical = Math.abs(verticalDistance)
-        const isHorizontalSwipe = absHorizontal > absVertical && absHorizontal > absVertical * 1.5
+        // Ensure horizontal swipe is clearly horizontal (at least 1.5x vertical distance)
+        const isHorizontalSwipe = absHorizontal > absVertical * 1.5
         
         // On mobile: Only allow horizontal swipes for carousel navigation
         // Vertical swipes are disabled to prevent interference with normal page scrolling
-        // Process horizontal swipes for carousel navigation
-        if (absHorizontal > 50 && isHorizontalSwipe) {
-          // Swipe left - go to next letter
+        // Process horizontal swipes for carousel navigation (lowered threshold for better manual swipe responsiveness)
+        if (absHorizontal > 30 && isHorizontalSwipe) {
+          // Swipe left (positive swipeDistance) - go to next letter
           if (swipeDistance > 0 && canAdvance) {
             setCurrentLetterIndex((prevIndex) => {
               if (prevIndex < frameworkData.length - 1) {
@@ -452,7 +453,7 @@ const About = () => {
             resetTouch()
             return
           }
-          // Swipe right - go to previous letter
+          // Swipe right (negative swipeDistance) - go to previous letter
           else if (swipeDistance < 0 && canAdvance) {
             setCurrentLetterIndex((prevIndex) => {
               if (prevIndex > 0) {
@@ -980,26 +981,27 @@ const About = () => {
                 </div>
               </div>
 
-              {/* Mobile: Letters Row at Top */}
-              <div className="lg:hidden mb-6 w-full">
-                <div className="flex items-center justify-center gap-1 sm:gap-1.5 md:gap-2 overflow-x-auto scrollbar-hide">
+              {/* Mobile: Vertical Letters on Left, Content on Right */}
+              <div className="lg:hidden w-full flex gap-4 sm:gap-6">
+                {/* Mobile: Vertical Letters Column on Left */}
+                <div className="flex-shrink-0 flex flex-col items-start gap-4 sm:gap-5 md:gap-6">
                   {frameworkData.map((item, index) => {
                     const letter = item.letter
                     const isActive = currentLetterIndex === index
                     const isPast = currentLetterIndex > index
                     
                     return (
-                      <div key={index} className="flex-shrink-0">
+                      <div key={index} className="flex-shrink-0 py-1 sm:py-1.5">
                         <div 
                           onClick={() => handleLetterClick(index)}
-                          className={`relative w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-500 cursor-pointer hover:scale-110 ${
+                          className={`relative w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-500 cursor-pointer hover:scale-110 ${
                             isActive 
                               ? 'scale-110 bg-gradient-to-br from-deep-teal via-accent-orange to-deep-teal shadow-lg ring-2 ring-deep-teal/30' 
                               : isPast
                               ? 'bg-deep-teal/40 scale-100 ring-1 ring-deep-teal/20'
                               : 'bg-white/10 scale-100 ring-1 ring-white/20'
                           }`}>
-                          <span className={`text-base sm:text-lg md:text-xl font-bold ${
+                          <span className={`text-base sm:text-lg font-bold ${
                             isActive ? 'text-white' : isPast ? 'text-white/80' : 'text-white/40'
                           }`}>
                             {letter}
@@ -1009,86 +1011,84 @@ const About = () => {
                     )
                   })}
                 </div>
-              </div>
-              
 
               {/* Center and Right - Main Content Area */}
-              <div ref={mobileCarouselRef} className="lg:col-span-10 w-full min-h-[400px] relative px-12 sm:px-14 md:px-16 lg:px-0">
-                {/* Mobile: Left Arrow Button */}
-                {currentLetterIndex > 0 && (
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                      if (currentLetterIndex > 0 && canAdvance) {
-                        // Use functional update to ensure we're using the latest state
-                        setCurrentLetterIndex((prevIndex) => {
-                          // Double check to prevent going below 0
-                          if (prevIndex > 0) {
-                            return prevIndex - 1
-                          }
-                          return prevIndex
-                        })
-                        setIsSContentFullyVisible(false)
-                        setCanAdvance(false)
-                        setTimeout(() => {
-                          setCanAdvance(true)
-                        }, 600)
-                      }
-                    }}
-                    className="lg:hidden absolute left-0 sm:left-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-all duration-300 active:scale-95 shadow-lg"
-                    aria-label="Previous letter"
-                  >
-                    <svg className="w-6 h-6 sm:w-7 sm:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M15 19l-7-7 7-7" />
-                    </svg>
-                  </button>
-                )}
+              <div ref={mobileCarouselRef} className="flex-1 min-h-[400px] relative">
                 
-                {/* Mobile: Right Arrow Button */}
-                {currentLetterIndex < frameworkData.length - 1 && (
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                      // Prevent multiple rapid clicks
-                      if (!canAdvance) return
-                      
-                      // Calculate next index using functional update to avoid stale closure
-                      setCurrentLetterIndex((prevIndex) => {
-                        const nextIdx = prevIndex + 1
-                        // Only proceed if we're not at the last letter
-                        if (nextIdx < frameworkData.length) {
-                          return nextIdx
-                        }
-                        return prevIndex
-                      })
-                      
-                      // Update canAdvance state outside the functional update
-                      setCanAdvance(false)
-                      
-                      // Handle S visibility and canAdvance reset based on what the next index will be
-                      const nextIndex = currentLetterIndex + 1
-                      if (nextIndex === frameworkData.length - 1) {
-                        setTimeout(() => {
-                          setIsSContentFullyVisible(true)
-                          setCanAdvance(true)
-                        }, 600)
-                      } else {
-                        setTimeout(() => {
-                          setCanAdvance(true)
-                        }, 600)
-                      }
-                    }}
-                    className="lg:hidden absolute right-0 sm:right-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-all duration-300 active:scale-95 shadow-lg"
-                    aria-label="Next letter"
-                  >
-                    <svg className="w-6 h-6 sm:w-7 sm:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
-                )}
-                
+                {frameworkData.map((item, index) => {
+                  const letter = item.letter
+                  // Show content if it's the active letter
+                  // If carousel is active but currentLetterIndex is -1, default to showing first letter (index 0)
+                  const activeIndex = currentLetterIndex >= 0 ? currentLetterIndex : (isAnimating && !animationComplete ? 0 : -1)
+                  const isActive = activeIndex === index
+                  
+                  if (!isActive || activeIndex === -1) return null
+                  
+                  return (
+                    <div
+                      key={index}
+                      className="w-full flex flex-col lg:flex-row items-center lg:items-start gap-4 sm:gap-6 lg:gap-12 transition-all duration-700"
+                      style={{ WebkitTouchCallout: 'none', WebkitUserSelect: 'none' }}
+                    >
+                      {/* Center - Large Letter Circle (Desktop Only) */}
+                      <div className="hidden lg:flex flex-shrink-0 w-full lg:w-auto mb-4 lg:mb-0">
+                        <div className="relative w-16 h-16 sm:w-20 sm:h-20 md:w-28 md:h-28 lg:w-96 lg:h-96 mx-auto lg:mx-0">
+                          {/* Animated Background Circle */}
+                          <div className="absolute inset-0 rounded-full animate-circle-gradient overflow-hidden">
+                            <div className="absolute inset-0 bg-gradient-to-br from-deep-teal via-accent-orange to-deep-teal bg-[length:200%_200%] animate-gradient-move"></div>
+                          </div>
+                          {/* Letter */}
+                          <div className="relative w-full h-full flex items-center justify-center">
+                            <span className="text-xl sm:text-2xl md:text-3xl lg:text-[12rem] font-black text-white drop-shadow-2xl z-10">
+                              {letter}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Right Side - Content */}
+                      <div className="flex-1 space-y-3 sm:space-y-4 md:space-y-6 w-full text-left">
+                        {/* Mobile: Show title at top */}
+                        <div>
+                          <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">
+                            {index + 1}. {item.letter} – {item.title}
+                          </h3>
+                          <p className="text-sm sm:text-base md:text-lg lg:text-xl font-semibold text-cyan-300 mb-3 sm:mb-4 text-left">
+                            {item.subtitle}
+                          </p>
+                        </div>
+                        
+                        <p className="text-sm sm:text-base md:text-lg text-gray-200 leading-relaxed text-left">
+                          {item.description}
+                        </p>
+
+                        <ul className="space-y-2 md:space-y-3 text-left">
+                          {item.points.map((point, idx) => (
+                            <li key={idx} className="flex items-start gap-2 sm:gap-3">
+                              <span className="text-accent-orange text-base sm:text-lg font-bold mt-0.5 sm:mt-1 flex-shrink-0">✔</span>
+                              <span className="text-sm sm:text-base md:text-lg text-gray-200 leading-relaxed">{point}</span>
+                            </li>
+                          ))}
+                        </ul>
+
+                        <p className="text-sm sm:text-base md:text-lg text-gray-200 leading-relaxed font-medium pt-2 text-left">
+                          {item.footer}
+                        </p>
+
+                        <div className="pt-2 text-left">
+                          <p className="text-xs sm:text-sm md:text-base text-cyan-300 font-semibold">
+                            {item.modules}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+              </div>
+
+              {/* Desktop: Center and Right - Main Content Area */}
+              <div className="hidden lg:block lg:col-span-10 w-full min-h-[400px] relative">
                 {frameworkData.map((item, index) => {
                   const letter = item.letter
                   // Show content if it's the active letter
@@ -1106,30 +1106,24 @@ const About = () => {
                     >
                       {/* Center - Large Letter Circle */}
                       <div className="flex-shrink-0 w-full lg:w-auto mb-4 lg:mb-0">
-                        <div className="relative w-24 h-24 sm:w-28 sm:h-28 md:w-40 md:h-40 lg:w-96 lg:h-96 mx-auto lg:mx-0">
+                        <div className="relative w-16 h-16 sm:w-20 sm:h-20 md:w-28 md:h-28 lg:w-96 lg:h-96 mx-auto lg:mx-0">
                           {/* Animated Background Circle */}
                           <div className="absolute inset-0 rounded-full animate-circle-gradient overflow-hidden">
                             <div className="absolute inset-0 bg-gradient-to-br from-deep-teal via-accent-orange to-deep-teal bg-[length:200%_200%] animate-gradient-move"></div>
                           </div>
                           {/* Letter */}
                           <div className="relative w-full h-full flex items-center justify-center">
-                            <span className="text-3xl sm:text-4xl md:text-5xl lg:text-[12rem] font-black text-white drop-shadow-2xl z-10">
+                            <span className="text-xl sm:text-2xl md:text-3xl lg:text-[12rem] font-black text-white drop-shadow-2xl z-10">
                               {letter}
                             </span>
                           </div>
-                        </div>
-                        {/* Title below circle on mobile */}
-                        <div className="lg:hidden mt-2 text-center">
-                          <h3 className="text-base sm:text-lg md:text-xl font-bold text-white">
-                            {item.title}
-                          </h3>
                         </div>
                       </div>
 
                       {/* Right Side - Content */}
                       <div className="flex-1 space-y-3 sm:space-y-4 md:space-y-6 w-full text-left">
                         <div>
-                          <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-2 hidden lg:block">
+                          <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-2">
                             {index + 1}. {item.letter} – {item.title}
                           </h3>
                           <p className="text-sm sm:text-base md:text-lg lg:text-xl font-semibold text-cyan-300 mb-3 sm:mb-4 text-left">
