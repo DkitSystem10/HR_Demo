@@ -161,7 +161,10 @@ const Navbar = () => {
             {/* Desktop Action Buttons */}
             <div className="flex items-center gap-3 ml-4">
               <button
-                onClick={() => navigate('/login')}
+                onClick={() => {
+                  // Handle login navigation
+                  console.log('Login clicked')
+                }}
                 className="px-6 py-2.5 bg-accent-orange text-white font-semibold rounded-lg shadow-[0_4px_0_0_#cc6200,0_6px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_2px_0_0_#cc6200,0_4px_8px_rgba(0,0,0,0.15)] hover:translate-y-0.5 transition-all duration-150 active:shadow-[0_1px_0_0_#cc6200,0_2px_4px_rgba(0,0,0,0.15)] active:translate-y-1"
               >
                 Login
@@ -285,7 +288,8 @@ const Navbar = () => {
               <button
                 onClick={() => {
                   setIsMobileMenuOpen(false)
-                  navigate('/login')
+                  // Handle login navigation
+                  console.log('Login clicked')
                 }}
                 className="w-full px-6 py-3 bg-accent-orange text-white font-semibold rounded-lg shadow-[0_4px_0_0_#cc6200,0_6px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_2px_0_0_#cc6200,0_4px_8px_rgba(0,0,0,0.15)] hover:translate-y-0.5 transition-all duration-150 active:shadow-[0_1px_0_0_#cc6200,0_2px_4px_rgba(0,0,0,0.15)] active:translate-y-1 text-center"
               >

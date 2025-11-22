@@ -121,7 +121,7 @@ const DataMasterDetail = () => {
           <div className="absolute top-20 -right-10 h-32 w-32 rounded-full bg-white/60 blur-2xl"></div>
           <div className="absolute bottom-10 left-10 h-24 w-24 rounded-full bg-accent-orange/10 blur-xl"></div>
         </div>
-        <div className="relative max-w-5xl mx-auto px-4 md:px-10 pt-24 pb-16 text-center">
+        <div className="relative max-w-5xl mx-auto px-4 md:px-10 pt-28 md:pt-36 pb-16 text-center">
           <span className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-accent-orange/10 text-accent-orange font-semibold uppercase tracking-wide text-xs md:text-sm">
             Data Master
           </span>

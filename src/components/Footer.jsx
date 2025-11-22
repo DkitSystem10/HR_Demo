@@ -11,7 +11,7 @@ const Footer = () => {
   }
 
   return (
-    <footer className="bg-gradient-to-br from-navy-blue via-navy-blue to-deep-teal/20 border-t-2 border-accent-orange/30 shadow-lg">
+    <footer className="bg-navy-blue border-t-2 border-accent-orange/30 shadow-none" style={{ boxShadow: 'none' }}>
       <div className="max-w-7xl mx-auto px-4 md:px-8 py-6 md:py-8">
         <div className="flex flex-col items-center text-center space-y-4 md:space-y-5">
           {/* Company Logo + Brand Name */}
@@ -29,7 +29,7 @@ const Footer = () => {
           {/* Navigation Links */}
           <nav className="flex flex-wrap justify-center items-center gap-4 md:gap-6">
             <button
-              onClick={() => handleNavigation('/#about')}
+              onClick={() => handleNavigation('/about')}
               className="text-gray-300 hover:text-accent-orange transition-colors duration-200 font-medium text-sm"
             >
               About Us
@@ -41,7 +41,7 @@ const Footer = () => {
               Contact Us
             </button>
             <button
-              onClick={() => handleNavigation('/careers')}
+              onClick={() => handleNavigation('/')}
               className="text-gray-300 hover:text-accent-orange transition-colors duration-200 font-medium text-sm"
             >
               Careers

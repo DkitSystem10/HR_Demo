@@ -153,6 +153,25 @@ const About = () => {
   const [canAdvance, setCanAdvance] = useState(true)
   const [isAtHeroSection, setIsAtHeroSection] = useState(false)
   const [isSContentFullyVisible, setIsSContentFullyVisible] = useState(false)
+  const carouselInitializedRef = useRef(false)
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Track window size for mobile detection
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768)
+    }
+    
+    // Check on mount
+    checkMobile()
+    
+    // Check on resize
+    window.addEventListener('resize', checkMobile)
+    
+    return () => {
+      window.removeEventListener('resize', checkMobile)
+    }
+  }, [])
 
   // Handle letter click
   const handleLetterClick = useCallback((index) => {
@@ -201,9 +220,6 @@ const About = () => {
         }
       }
     }
-
-    // Detect if device is mobile
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768
 
     const showPreviousLetter = () => {
       if (currentLetterIndex > 0) {
@@ -336,6 +352,8 @@ const About = () => {
       if (isMobile && isAnimating && !animationComplete && currentLetterIndex >= 0) {
         touchStartXRef.current = e.touches[0].clientX
         touchStartYRef.current = e.touches[0].clientY
+        touchEndXRef.current = touchStartXRef.current
+        touchEndYRef.current = touchStartYRef.current
       }
     }
 
@@ -349,7 +367,7 @@ const About = () => {
         
         // Only prevent default if it's a horizontal swipe (for carousel navigation)
         // Allow vertical scrolling to work normally
-        if (horizontalDistance > 10 && horizontalDistance > verticalDistance) {
+        if (horizontalDistance > 10 && horizontalDistance > verticalDistance * 1.5) {
           e.preventDefault()
           e.stopPropagation()
         }
@@ -361,6 +379,14 @@ const About = () => {
       if (isMobile && isAnimating && !animationComplete && currentLetterIndex >= 0) {
         const swipeDistance = touchStartXRef.current - touchEndXRef.current
         const verticalDistance = touchStartYRef.current - touchEndYRef.current
+        
+        // Reset touch positions after processing
+        const resetTouch = () => {
+          touchStartXRef.current = 0
+          touchStartYRef.current = 0
+          touchEndXRef.current = 0
+          touchEndYRef.current = 0
+        }
         
         // If on S and swiping down vertically, allow scrolling to footer
         if (currentLetterIndex === frameworkData.length - 1 && isSContentFullyVisible && verticalDistance < -50 && Math.abs(verticalDistance) > Math.abs(swipeDistance)) {
@@ -388,72 +414,106 @@ const About = () => {
               isGoingToFooterRef.current = false
             }, 1000)
           })
+          resetTouch()
           return
         }
         
-        // Process vertical swipes for carousel navigation
-        if (Math.abs(verticalDistance) > 50 && Math.abs(verticalDistance) > Math.abs(swipeDistance)) {
+        // Determine primary swipe direction
+        const absHorizontal = Math.abs(swipeDistance)
+        const absVertical = Math.abs(verticalDistance)
+        const isVerticalSwipe = absVertical > absHorizontal
+        const isHorizontalSwipe = absHorizontal > absVertical
+        
+        // Process vertical swipes for carousel navigation (lowered threshold for better responsiveness)
+        if (absVertical > 30 && isVerticalSwipe) {
           // Swipe up - go to previous letter
-          if (verticalDistance > 0 && currentLetterIndex > 0) {
-            const prevIndex = currentLetterIndex - 1
-            setCurrentLetterIndex(prevIndex)
+          if (verticalDistance > 0 && canAdvance) {
+            setCurrentLetterIndex((prevIndex) => {
+              if (prevIndex > 0) {
+                return prevIndex - 1
+              }
+              return prevIndex
+            })
             setIsSContentFullyVisible(false) // Reset S visibility when going back
             setCanAdvance(false)
             setTimeout(() => {
               setCanAdvance(true)
             }, 600)
+            resetTouch()
+            return // Prevent horizontal handler from processing
           }
           // Swipe down - go to next letter (only if not on last letter)
-          else if (verticalDistance < 0 && currentLetterIndex < frameworkData.length - 1 && canAdvance) {
-            const nextIndex = currentLetterIndex + 1
-            setCurrentLetterIndex(nextIndex)
-            setCanAdvance(false)
-            
-            // If reached S, mark it as fully visible after animation
-            if (nextIndex === frameworkData.length - 1) {
-              setTimeout(() => {
-                setIsSContentFullyVisible(true)
-                setCanAdvance(true)
-              }, 600)
-            } else {
-              setTimeout(() => {
-                setCanAdvance(true)
-              }, 600)
-            }
+          else if (verticalDistance < 0 && canAdvance) {
+            setCurrentLetterIndex((prevIndex) => {
+              if (prevIndex < frameworkData.length - 1) {
+                const nextIdx = prevIndex + 1
+                setCanAdvance(false)
+                // Check if we'll reach S
+                if (nextIdx === frameworkData.length - 1) {
+                  setTimeout(() => {
+                    setIsSContentFullyVisible(true)
+                    setCanAdvance(true)
+                  }, 600)
+                } else {
+                  setTimeout(() => {
+                    setCanAdvance(true)
+                  }, 600)
+                }
+                return nextIdx
+              }
+              return prevIndex
+            })
+            resetTouch()
+            return // Prevent horizontal handler from processing
           }
         }
         
-        // Process horizontal swipes for carousel navigation
-        if (Math.abs(swipeDistance) > 50 && Math.abs(swipeDistance) > Math.abs(verticalDistance)) {
+        // Process horizontal swipes for carousel navigation (only if not already processed vertical)
+        if (absHorizontal > 30 && isHorizontalSwipe) {
           // Swipe left - go to next letter
-          if (swipeDistance > 0 && currentLetterIndex < frameworkData.length - 1 && canAdvance) {
-            const nextIndex = currentLetterIndex + 1
-            setCurrentLetterIndex(nextIndex)
-            setCanAdvance(false)
-            
-            // If reached S, mark it as fully visible after animation
-            if (nextIndex === frameworkData.length - 1) {
-              setTimeout(() => {
-                setIsSContentFullyVisible(true)
-                setCanAdvance(true)
-              }, 600)
-            } else {
-              setTimeout(() => {
-                setCanAdvance(true)
-              }, 600)
-            }
+          if (swipeDistance > 0 && canAdvance) {
+            setCurrentLetterIndex((prevIndex) => {
+              if (prevIndex < frameworkData.length - 1) {
+                const nextIdx = prevIndex + 1
+                setCanAdvance(false)
+                // Check if we'll reach S
+                if (nextIdx === frameworkData.length - 1) {
+                  setTimeout(() => {
+                    setIsSContentFullyVisible(true)
+                    setCanAdvance(true)
+                  }, 600)
+                } else {
+                  setTimeout(() => {
+                    setCanAdvance(true)
+                  }, 600)
+                }
+                return nextIdx
+              }
+              return prevIndex
+            })
+            resetTouch()
+            return
           }
           // Swipe right - go to previous letter
-          else if (swipeDistance < 0 && currentLetterIndex > 0) {
-            const prevIndex = currentLetterIndex - 1
-            setCurrentLetterIndex(prevIndex)
+          else if (swipeDistance < 0 && canAdvance) {
+            setCurrentLetterIndex((prevIndex) => {
+              if (prevIndex > 0) {
+                return prevIndex - 1
+              }
+              return prevIndex
+            })
             setIsSContentFullyVisible(false) // Reset S visibility when going back
             setCanAdvance(false)
             setTimeout(() => {
               setCanAdvance(true)
             }, 600)
+            resetTouch()
+            return
           }
         }
+        
+        // Reset touch if no swipe was detected
+        resetTouch()
       }
     }
 
@@ -570,6 +630,9 @@ const About = () => {
         // Mobile: Allow normal scrolling, but enable swipe carousel
         const contentArea = lettersContentRef.current
         const carouselGrid = carouselContentGridRef.current
+        const mainContentArea = mobileCarouselRef.current
+        
+        // Attach to multiple elements to ensure swipe detection works
         if (contentArea) {
           contentArea.addEventListener('touchstart', handleMobileTouchStart, { passive: true })
           contentArea.addEventListener('touchmove', handleMobileTouchMove, { passive: false })
@@ -581,6 +644,12 @@ const About = () => {
           carouselGrid.addEventListener('touchmove', handleMobileTouchMove, { passive: false })
           carouselGrid.addEventListener('touchend', handleMobileTouchEnd, { passive: true })
         }
+        // Attach to main content area as well
+        if (mainContentArea) {
+          mainContentArea.addEventListener('touchstart', handleMobileTouchStart, { passive: true })
+          mainContentArea.addEventListener('touchmove', handleMobileTouchMove, { passive: false })
+          mainContentArea.addEventListener('touchend', handleMobileTouchEnd, { passive: true })
+        }
         window.addEventListener('keydown', handleKeyDown, { passive: false })
         // Don't lock scroll on mobile - allow normal scrolling
       }
@@ -588,7 +657,6 @@ const About = () => {
     } else if (animationComplete && !isAtHeroSection && !isGoingToFooterRef.current) {
       // Restore scroll position only after animation completes (but not when going to hero section or footer)
       // Only restore on desktop - mobile never locks scroll
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768
       if (!isMobile) {
         document.body.style.overflow = ''
         document.body.style.position = ''
@@ -611,6 +679,7 @@ const About = () => {
       // Remove mobile touch listeners
       const contentArea = lettersContentRef.current
       const carouselGrid = carouselContentGridRef.current
+      const mainContentArea = mobileCarouselRef.current
       if (contentArea) {
         contentArea.removeEventListener('touchstart', handleMobileTouchStart)
         contentArea.removeEventListener('touchmove', handleMobileTouchMove)
@@ -621,18 +690,22 @@ const About = () => {
         carouselGrid.removeEventListener('touchmove', handleMobileTouchMove)
         carouselGrid.removeEventListener('touchend', handleMobileTouchEnd)
       }
+      if (mainContentArea) {
+        mainContentArea.removeEventListener('touchstart', handleMobileTouchStart)
+        mainContentArea.removeEventListener('touchmove', handleMobileTouchMove)
+        mainContentArea.removeEventListener('touchend', handleMobileTouchEnd)
+      }
       document.body.style.overflow = ''
       document.body.style.position = ''
       document.body.style.top = ''
       document.body.style.width = ''
     }
-  }, [isAnimating, animationComplete, canAdvance, currentLetterIndex, isAtHeroSection])
+  }, [isAnimating, animationComplete, canAdvance, currentLetterIndex, isAtHeroSection, isMobile, isSContentFullyVisible])
 
   // Handle scrolling from hero section back to letters section
   useEffect(() => {
     if (!isAtHeroSection || isAnimating) return
 
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768
     if (isMobile) return
 
     const returnToLettersSection = () => {
@@ -643,6 +716,7 @@ const About = () => {
       setAnimationComplete(false)
       setCurrentLetterIndex(0)
       setCanAdvance(true)
+      carouselInitializedRef.current = true
 
       // Lock scroll and scroll to letters section
       const currentScroll = window.pageYOffset || document.documentElement.scrollTop
@@ -695,19 +769,19 @@ const About = () => {
   // Users must manually swipe through D U R K K A S letters
 
   // Ensure currentLetterIndex is set when carousel becomes active
+  // Only set to 0 if it's still -1 (initial state), don't reset if user is navigating
   useEffect(() => {
-    if (isAnimating && !animationComplete && currentLetterIndex === -1) {
+    // Only set initial index once, never reset after initialization
+    if (isAnimating && !animationComplete && currentLetterIndex === -1 && !carouselInitializedRef.current) {
       setCurrentLetterIndex(0)
       setCanAdvance(true)
+      carouselInitializedRef.current = true
     }
-  }, [isAnimating, animationComplete, currentLetterIndex])
+  }, [isAnimating, animationComplete])
 
   // Intersection Observer to trigger animation - watches letters content section (below description)
   useEffect(() => {
     if (animationComplete || isPositioningRef.current || isAtHeroSection) return
-
-    // Detect if device is mobile
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -720,6 +794,8 @@ const About = () => {
             entry.boundingClientRect.top > -100 &&
             entry.boundingClientRect.bottom > window.innerHeight * 0.2
           
+          // Only trigger if carousel hasn't started yet (currentLetterIndex is -1)
+          // Don't reset if user is already navigating through letters
           if (isContentVisible && currentLetterIndex === -1 && !isAnimating && !isPositioningRef.current) {
             isPositioningRef.current = true
             
@@ -729,6 +805,7 @@ const About = () => {
               scrollLockRef.current = true
               setCurrentLetterIndex(0)
               setCanAdvance(true)
+              carouselInitializedRef.current = true
               scrollPositionRef.current = window.pageYOffset || document.documentElement.scrollTop
               isPositioningRef.current = false
             } else {
@@ -766,6 +843,7 @@ const About = () => {
                 // Start with first letter
                 setCurrentLetterIndex(0)
                 setCanAdvance(true)
+                carouselInitializedRef.current = true
                 // Save the final scroll position
                 scrollPositionRef.current = window.pageYOffset || document.documentElement.scrollTop
                 isPositioningRef.current = false
@@ -787,7 +865,7 @@ const About = () => {
         observer.unobserve(currentRef)
       }
     }
-  }, [currentLetterIndex, isAnimating, animationComplete, isAtHeroSection])
+  }, [isAnimating, animationComplete, isAtHeroSection])
 
   return (
     <div className="min-h-screen bg-white">
@@ -977,14 +1055,22 @@ const About = () => {
               
 
               {/* Center and Right - Main Content Area */}
-              <div className="lg:col-span-10 w-full min-h-[400px] relative px-12 sm:px-14 md:px-16 lg:px-0">
+              <div ref={mobileCarouselRef} className="lg:col-span-10 w-full min-h-[400px] relative px-12 sm:px-14 md:px-16 lg:px-0">
                 {/* Mobile: Left Arrow Button */}
                 {currentLetterIndex > 0 && (
                   <button
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
                       if (currentLetterIndex > 0 && canAdvance) {
-                        const prevIndex = currentLetterIndex - 1
-                        setCurrentLetterIndex(prevIndex)
+                        // Use functional update to ensure we're using the latest state
+                        setCurrentLetterIndex((prevIndex) => {
+                          // Double check to prevent going below 0
+                          if (prevIndex > 0) {
+                            return prevIndex - 1
+                          }
+                          return prevIndex
+                        })
                         setIsSContentFullyVisible(false)
                         setCanAdvance(false)
                         setTimeout(() => {
@@ -1004,22 +1090,36 @@ const About = () => {
                 {/* Mobile: Right Arrow Button */}
                 {currentLetterIndex < frameworkData.length - 1 && (
                   <button
-                    onClick={() => {
-                      if (currentLetterIndex < frameworkData.length - 1 && canAdvance) {
-                        const nextIndex = currentLetterIndex + 1
-                        setCurrentLetterIndex(nextIndex)
-                        setCanAdvance(false)
-                        
-                        if (nextIndex === frameworkData.length - 1) {
-                          setTimeout(() => {
-                            setIsSContentFullyVisible(true)
-                            setCanAdvance(true)
-                          }, 600)
-                        } else {
-                          setTimeout(() => {
-                            setCanAdvance(true)
-                          }, 600)
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      // Prevent multiple rapid clicks
+                      if (!canAdvance) return
+                      
+                      // Calculate next index using functional update to avoid stale closure
+                      setCurrentLetterIndex((prevIndex) => {
+                        const nextIdx = prevIndex + 1
+                        // Only proceed if we're not at the last letter
+                        if (nextIdx < frameworkData.length) {
+                          return nextIdx
                         }
+                        return prevIndex
+                      })
+                      
+                      // Update canAdvance state outside the functional update
+                      setCanAdvance(false)
+                      
+                      // Handle S visibility and canAdvance reset based on what the next index will be
+                      const nextIndex = currentLetterIndex + 1
+                      if (nextIndex === frameworkData.length - 1) {
+                        setTimeout(() => {
+                          setIsSContentFullyVisible(true)
+                          setCanAdvance(true)
+                        }, 600)
+                      } else {
+                        setTimeout(() => {
+                          setCanAdvance(true)
+                        }, 600)
                       }
                     }}
                     className="lg:hidden absolute right-0 sm:right-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-all duration-300 active:scale-95 shadow-lg"

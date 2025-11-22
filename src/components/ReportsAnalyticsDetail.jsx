@@ -119,7 +119,7 @@ const ReportsAnalyticsDetail = () => {
           <div className="absolute top-16 right-12 h-40 w-40 rounded-full bg-accent-orange/10 blur-2xl"></div>
           <div className="absolute bottom-16 left-12 h-28 w-28 rounded-full bg-deep-teal/10 blur-2xl"></div>
         </div>
-        <div className="relative max-w-6xl mx-auto px-4 md:px-10 pt-24 pb-16">
+        <div className="relative max-w-6xl mx-auto px-4 md:px-10 pt-28 md:pt-36 pb-16">
           <div className="text-center max-w-4xl mx-auto">
             <span className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-accent-orange/10 text-accent-orange font-semibold uppercase tracking-wide text-xs md:text-sm">
               Reports &amp; Analytics

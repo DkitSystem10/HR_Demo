@@ -19,7 +19,7 @@ import payrollImage1 from '../assets/p.png'
 import payrollImage2 from '../assets/pay.png'
 import payrollImage3 from '../assets/pay1.png'
 import payrollImage4 from '../assets/pay2.png'
-import payrollImage5 from '../assets/pay3.jpeg'
+import payrollImage5 from '../assets/pay3.png'
 import payrollImage6 from '../assets/pay4.png'
 import payrollImage7 from '../assets/pay5.png'
 
@@ -150,18 +150,17 @@ const PayrollManagementDetail = () => {
           <div className="absolute top-20 -right-10 h-32 w-32 rounded-full bg-white/60 blur-2xl"></div>
           <div className="absolute bottom-10 left-10 h-24 w-24 rounded-full bg-accent-orange/10 blur-xl"></div>
         </div>
-        <div className="relative max-w-5xl mx-auto px-4 md:px-10 pt-24 pb-16 text-center">
-          <span className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-accent-orange/10 text-accent-orange font-semibold uppercase tracking-wide text-xs md:text-sm">
-            Payroll Management
-          </span>
-          <h1 className="mt-6 text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">
+        <div className="relative max-w-5xl mx-auto px-4 md:px-10 pt-28 md:pt-36 pb-16 text-center">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">
             <span className="bg-gradient-to-r from-deep-teal via-accent-orange to-deep-teal bg-clip-text text-transparent">
-              Streamline Payroll with Accuracy &amp; Compliance Built-In
+              Payroll Management
             </span>
           </h1>
-          <p className="mt-5 text-gray-700 text-base md:text-lg leading-relaxed max-w-3xl mx-auto">
-            Automate salary processing, deductions and statutory compliance to reduce manual work and errors—ensuring every
-            employee gets paid accurately and on time, every time.
+          <p className="mt-5 text-xl md:text-2xl font-semibold text-charcoal leading-tight max-w-3xl mx-auto">
+            Streamline Payroll with Accuracy &amp; Compliance Built-In
+          </p>
+          <p className="mt-6 text-base md:text-lg text-gray-700 leading-relaxed max-w-2xl mx-auto">
+            Automate salary processing, deductions and statutory compliance to reduce manual work and errors—ensuring every employee gets paid accurately and on time.
           </p>
         </div>
       </header>
@@ -235,7 +234,7 @@ const PayrollManagementDetail = () => {
                       <span className="block h-2 w-2 rounded-full bg-accent-orange"></span>
                     </div>
                     <div
-                      className={`md:w-1/2 w-full flex ${
+                      className={`${index === 0 ? 'md:w-full' : 'md:w-1/2'} w-full flex ${
                         isLeft ? 'md:order-1 md:pr-12' : 'md:order-2 md:pl-12'
                       }`}
                     >
@@ -271,21 +270,21 @@ const PayrollManagementDetail = () => {
                           <img
                             src={index === 0 ? payrollImage1 : index === 2 ? payrollImage2 : index === 3 ? payrollImage3 : index === 4 ? payrollImage5 : index === 5 ? payrollImage7 : index === 6 ? payrollImage6 : index === 1 ? payrollImage4 : dataMasterVisual}
                             alt={`${highlight.title} visual`}
-                            className="w-full h-full object-cover"
+                            className={`w-full h-full ${index === 0 ? 'object-contain' : 'object-cover'}`}
                             loading="lazy"
                           />
                         </div>
                       </div>
                     </div>
                     {index === 0 && (
-                      <div className="hidden md:flex md:w-1/2 md:order-2 md:pl-12 md:justify-start">
-                        <div className="relative w-full flex items-stretch">
+                      <div className="hidden md:flex md:w-full md:order-2 md:justify-center md:mt-6">
+                        <div className="relative w-full max-w-4xl flex items-stretch">
                           <div className="absolute inset-0 -z-10 rounded-[2.5rem] bg-accent-orange/10 blur-3xl"></div>
                           <div className="rounded-[2.5rem] overflow-hidden border border-white/70 shadow-2xl w-full">
                             <img
                               src={payrollImage1}
                               alt={`${highlight.title} illustration`}
-                              className="w-full h-full object-cover"
+                              className="w-full h-auto object-contain"
                               loading="lazy"
                             />
                           </div>

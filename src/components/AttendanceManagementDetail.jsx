@@ -104,20 +104,18 @@ const AttendanceManagementDetail = () => {
           <div className="absolute top-12 right-10 h-36 w-36 rounded-full bg-accent-orange/10 blur-2xl"></div>
           <div className="absolute bottom-16 left-16 h-28 w-28 rounded-full bg-deep-teal/10 blur-2xl"></div>
         </div>
-        <div className="relative max-w-6xl mx-auto px-4 md:px-10 pt-24 pb-16">
+        <div className="relative max-w-6xl mx-auto px-4 md:px-10 pt-28 md:pt-36 pb-16">
           <div className="text-center max-w-4xl mx-auto">
-            <span className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-accent-orange/10 text-accent-orange font-semibold uppercase tracking-wide text-xs md:text-sm">
-              Attendance Management
-            </span>
-            <h1 className="mt-6 text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">
               <span className="bg-gradient-to-r from-deep-teal via-accent-orange to-deep-teal bg-clip-text text-transparent">
-                Smart Attendance Tracking for Modern Workplaces
+                Attendance Management
               </span>
             </h1>
-            <p className="mt-5 text-base md:text-lg text-gray-700 leading-relaxed max-w-3xl mx-auto">
-              Our Attendance Management Module helps organisations capture accurate time, shift, and leave data with zero
-              manual effort. Seamless biometric integrations, real-time dashboards, and correction workflows ensure every minute
-              is accounted for across locations.
+            <p className="mt-5 text-xl md:text-2xl font-semibold text-charcoal leading-tight max-w-3xl mx-auto">
+              Smart Attendance Tracking for Modern Workplaces
+            </p>
+            <p className="mt-6 text-base md:text-lg text-gray-700 leading-relaxed max-w-2xl mx-auto">
+              Capture accurate time, shift, and leave data with zero manual effort. Seamless biometric integrations, real-time dashboards, and correction workflows ensure every minute is accounted for across locations.
             </p>
             <div className="mt-8 grid gap-6 sm:grid-cols-2 max-w-3xl mx-auto">
               {/* Coverage Card */}

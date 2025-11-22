@@ -15,6 +15,8 @@ import {
   BarChart3,
   CheckCircle2
 } from 'lucide-react'
+import statutoryManagementImg from '../assets/Statutory Management.png'
+import statutoryManagementImg1 from '../assets/Statutory Management_1.png'
 
 const featureHighlights = [
   {
@@ -99,18 +101,25 @@ const Test = () => {
           <div className="text-center max-w-4xl mx-auto">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">
               <span className="bg-gradient-to-r from-deep-teal via-accent-orange to-deep-teal bg-clip-text text-transparent">
-                Statutory Management – Durkkas HR
+                Statutory Management
               </span>
             </h1>
-            <p className="mt-5 text-2xl md:text-3xl font-bold text-charcoal leading-tight max-w-3xl mx-auto">
+            <p className="mt-5 text-xl md:text-2xl font-semibold text-charcoal leading-tight max-w-3xl mx-auto">
               Stay 100% Compliant. Zero Manual Work. Zero Errors.
             </p>
-            <p className="mt-5 text-base md:text-lg text-gray-700 leading-relaxed max-w-3xl mx-auto">
-              Durkkas HR Tool provides a fully automated Statutory Compliance Management System that helps organizations comply with all mandatory labour laws, payroll regulations, filings and documentation requirements without complexity.
+            <p className="mt-6 text-base md:text-lg text-gray-700 leading-relaxed max-w-2xl mx-auto">
+              Automated statutory compliance management system that ensures seamless adherence to all mandatory labour laws, payroll regulations, and documentation requirements—reducing risks and improving audit readiness.
             </p>
-            <p className="mt-4 text-base md:text-lg text-gray-700 leading-relaxed max-w-3xl mx-auto">
-              Our tool ensures seamless compliance across HR, payroll, and workforce operations—reducing risks and improving audit readiness.
-            </p>
+          </div>
+          {/* Hero Image */}
+          <div className="mt-12 md:mt-16 max-w-5xl mx-auto">
+            <div className="relative rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl border border-white/20">
+              <img
+                src={statutoryManagementImg}
+                alt="Statutory Management Dashboard"
+                className="w-full h-auto max-h-[400px] md:max-h-[500px] lg:max-h-[600px] object-contain"
+              />
+            </div>
           </div>
         </div>
       </header>
@@ -151,19 +160,34 @@ const Test = () => {
 
       <section className="relative pb-24">
         <div className="relative max-w-6xl mx-auto px-4 md:px-10">
-          <div className="rounded-3xl bg-gradient-to-br from-white via-deep-teal/5 to-accent-orange/10 shadow-xl border border-white/70 p-6 md:p-10">
-            <h2 className="text-2xl md:text-3xl font-bold text-charcoal flex items-center gap-3 mb-6">
-              <CheckCircle2 className="w-6 h-6 text-accent-orange" />
-              Why Choose Durkkas HR Tool for Statutory Compliance?
-            </h2>
-            <ul className="space-y-4 text-gray-700 leading-relaxed">
-              {benefits.map((benefit) => (
-                <li key={benefit} className="flex items-start gap-3">
-                  <span className="mt-2 inline-flex w-2 h-2 rounded-full bg-accent-orange flex-shrink-0"></span>
-                  <span className="text-lg md:text-xl font-semibold text-charcoal/90">{benefit}</span>
-                </li>
-              ))}
-            </ul>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            {/* Image Section */}
+            <div className="order-2 lg:order-1">
+              <div className="relative rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl border border-white/20">
+                <img
+                  src={statutoryManagementImg1}
+                  alt="Statutory Compliance Features"
+                  className="w-full h-auto object-cover"
+                />
+              </div>
+            </div>
+            {/* Content Section */}
+            <div className="order-1 lg:order-2">
+              <div className="rounded-3xl bg-gradient-to-br from-white via-deep-teal/5 to-accent-orange/10 shadow-xl border border-white/70 p-6 md:p-10">
+                <h2 className="text-2xl md:text-3xl font-bold text-charcoal flex items-center gap-3 mb-6">
+                  <CheckCircle2 className="w-6 h-6 text-accent-orange" />
+                  Why Choose Durkkas HR Tool for Statutory Compliance?
+                </h2>
+                <ul className="space-y-4 text-gray-700 leading-relaxed">
+                  {benefits.map((benefit) => (
+                    <li key={benefit} className="flex items-start gap-3">
+                      <span className="mt-2 inline-flex w-2 h-2 rounded-full bg-accent-orange flex-shrink-0"></span>
+                      <span className="text-lg md:text-xl font-semibold text-charcoal/90">{benefit}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </section>

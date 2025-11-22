@@ -18,7 +18,7 @@ const HeroSection = () => {
   }
 
   return (
-    <section className="relative pt-24 md:pt-28 lg:pt-32 pb-8 md:pb-12 lg:pb-16 overflow-hidden">
+    <section className="relative pt-28 md:pt-36 lg:pt-40 pb-8 md:pb-12 lg:pb-16 overflow-hidden">
       {/* Blurred background image */}
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat filter blur-md -z-10 scale-110"
