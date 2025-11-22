@@ -68,13 +68,13 @@ const Navbar = () => {
           }}
         >
           {/* Logo */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 md:gap-3">
             <img 
               src={logo} 
               alt="DurkkasHR Logo" 
               className="h-14 w-auto md:h-20"
             />
-            <span className="text-2xl md:text-3xl lg:text-4xl font-bold">
+            <span className="text-2xl md:text-3xl lg:text-4xl font-bold leading-none">
               <span className="text-deep-teal">Durkkas</span><span className="text-accent-orange">HR</span>
             </span>
           </div>
