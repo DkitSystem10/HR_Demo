@@ -5,7 +5,7 @@ const Topbar = () => {
     <>
       {/* Mobile: Only Social Icons */}
       <div 
-        className="flex md:hidden bg-navy-blue text-white px-4 fixed top-0 left-0 right-0 z-[60] h-10 items-center justify-end"
+        className="flex md:hidden bg-navy-blue text-white px-4 fixed top-0 left-0 right-0 z-[60] h-10 items-center justify-center"
         style={{ 
           height: '2.5rem',
           minHeight: '2.5rem',

@@ -365,9 +365,10 @@ const About = () => {
         const horizontalDistance = Math.abs(touchStartXRef.current - touchEndXRef.current)
         const verticalDistance = Math.abs(touchStartYRef.current - touchEndYRef.current)
         
-        // Only prevent default if it's a horizontal swipe (for carousel navigation)
-        // Allow vertical scrolling to work normally
-        if (horizontalDistance > 10 && horizontalDistance > verticalDistance * 1.5) {
+        // Only prevent default if it's a clear horizontal swipe (for carousel navigation)
+        // Use stricter threshold to avoid interfering with normal page scrolling
+        // Horizontal distance must be significantly greater than vertical (2x ratio)
+        if (horizontalDistance > 20 && horizontalDistance > verticalDistance * 2) {
           e.preventDefault()
           e.stopPropagation()
         }
@@ -421,55 +422,12 @@ const About = () => {
         // Determine primary swipe direction
         const absHorizontal = Math.abs(swipeDistance)
         const absVertical = Math.abs(verticalDistance)
-        const isVerticalSwipe = absVertical > absHorizontal
-        const isHorizontalSwipe = absHorizontal > absVertical
+        const isHorizontalSwipe = absHorizontal > absVertical && absHorizontal > absVertical * 1.5
         
-        // Process vertical swipes for carousel navigation (lowered threshold for better responsiveness)
-        if (absVertical > 30 && isVerticalSwipe) {
-          // Swipe up - go to previous letter
-          if (verticalDistance > 0 && canAdvance) {
-            setCurrentLetterIndex((prevIndex) => {
-              if (prevIndex > 0) {
-                return prevIndex - 1
-              }
-              return prevIndex
-            })
-            setIsSContentFullyVisible(false) // Reset S visibility when going back
-            setCanAdvance(false)
-            setTimeout(() => {
-              setCanAdvance(true)
-            }, 600)
-            resetTouch()
-            return // Prevent horizontal handler from processing
-          }
-          // Swipe down - go to next letter (only if not on last letter)
-          else if (verticalDistance < 0 && canAdvance) {
-            setCurrentLetterIndex((prevIndex) => {
-              if (prevIndex < frameworkData.length - 1) {
-                const nextIdx = prevIndex + 1
-                setCanAdvance(false)
-                // Check if we'll reach S
-                if (nextIdx === frameworkData.length - 1) {
-                  setTimeout(() => {
-                    setIsSContentFullyVisible(true)
-                    setCanAdvance(true)
-                  }, 600)
-                } else {
-                  setTimeout(() => {
-                    setCanAdvance(true)
-                  }, 600)
-                }
-                return nextIdx
-              }
-              return prevIndex
-            })
-            resetTouch()
-            return // Prevent horizontal handler from processing
-          }
-        }
-        
-        // Process horizontal swipes for carousel navigation (only if not already processed vertical)
-        if (absHorizontal > 30 && isHorizontalSwipe) {
+        // On mobile: Only allow horizontal swipes for carousel navigation
+        // Vertical swipes are disabled to prevent interference with normal page scrolling
+        // Process horizontal swipes for carousel navigation
+        if (absHorizontal > 50 && isHorizontalSwipe) {
           // Swipe left - go to next letter
           if (swipeDistance > 0 && canAdvance) {
             setCurrentLetterIndex((prevIndex) => {
