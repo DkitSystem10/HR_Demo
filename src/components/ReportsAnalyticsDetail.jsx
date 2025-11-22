@@ -125,11 +125,16 @@ const ReportsAnalyticsDetail = () => {
               Reports &amp; Analytics
             </span>
             <h1 className="mt-6 text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">
-              <span className="bg-gradient-to-r from-deep-teal via-accent-orange to-deep-teal bg-clip-text text-transparent">
+              <span 
+                className="animated-heading"
+                style={{
+                  color: 'rgb(0, 123, 131)'
+                }}
+              >
                 Turn Workforce Data into Immediate, Actionable Intelligence
               </span>
             </h1>
-            <p className="mt-5 text-base md:text-lg text-gray-700 leading-relaxed max-w-3xl mx-auto">
+            <p className="mt-5 text-base md:text-lg text-accent-orange leading-relaxed max-w-3xl mx-auto">
               The Reports &amp; Analytics module gives stakeholders a command centre for HR intelligence—from recruitment and
               attendance to performance outcomes. Visual dashboards, exportable summaries, and granular filters ensure every
               decision is backed by data.

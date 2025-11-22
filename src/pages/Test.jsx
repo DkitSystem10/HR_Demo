@@ -100,11 +100,16 @@ const Test = () => {
         <div className="relative max-w-6xl mx-auto px-4 md:px-10 pt-8 pb-16">
           <div className="text-center max-w-4xl mx-auto">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">
-              <span className="bg-gradient-to-r from-deep-teal via-accent-orange to-deep-teal bg-clip-text text-transparent">
+              <span 
+                className="animated-heading"
+                style={{
+                  color: 'rgb(0, 123, 131)'
+                }}
+              >
                 Statutory Management
               </span>
             </h1>
-            <p className="mt-5 text-xl md:text-2xl font-semibold text-charcoal leading-tight max-w-3xl mx-auto">
+            <p className="mt-5 text-xl md:text-2xl font-semibold text-accent-orange leading-tight max-w-3xl mx-auto">
               Stay 100% Compliant. Zero Manual Work. Zero Errors.
             </p>
             <p className="mt-6 text-base md:text-lg text-gray-700 leading-relaxed max-w-2xl mx-auto">

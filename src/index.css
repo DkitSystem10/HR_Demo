@@ -233,4 +233,45 @@ div[class*="z-[55]"] {
   display: none;
 }
 
+/* Animated Heading Glow Effect */
+@keyframes heading-glow {
+  0%, 100% {
+    text-shadow: 
+      1px 1px 0px rgba(0, 0, 0, 0.2), 
+      2px 2px 0px rgba(0, 0, 0, 0.15), 
+      3px 3px 0px rgba(0, 0, 0, 0.1), 
+      4px 4px 8px rgba(0, 0, 0, 0.3), 
+      5px 5px 12px rgba(0, 0, 0, 0.2),
+      0 0 15px rgba(0, 123, 131, 0.4),
+      0 0 25px rgba(0, 123, 131, 0.3);
+  }
+  50% {
+    text-shadow: 
+      1px 1px 0px rgba(0, 0, 0, 0.2), 
+      2px 2px 0px rgba(0, 0, 0, 0.15), 
+      3px 3px 0px rgba(0, 0, 0, 0.1), 
+      4px 4px 8px rgba(0, 0, 0, 0.3), 
+      5px 5px 12px rgba(0, 0, 0, 0.2),
+      0 0 25px rgba(0, 123, 131, 0.6),
+      0 0 35px rgba(0, 123, 131, 0.4),
+      0 0 45px rgba(0, 123, 131, 0.3);
+  }
+}
+
+@keyframes heading-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+.animated-heading {
+  animation: heading-glow 3s ease-in-out infinite, heading-pulse 4s ease-in-out infinite;
+  position: relative;
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
 
